@@ -562,18 +562,23 @@ div.popup-dot { display:none !important; }
   }
 }
 .share-btn {
-  padding: 0.5rem 0.9rem;
-  border-radius: 10px;
+  padding: 4px 10px;
+  border-radius: 999px;
   border: 1px solid var(--border);
-  background: var(--card-bg);
-  color: var(--text);
+  background: var(--bg-soft);
+  color: var(--text-soft);
+  font-size: 0.75rem;
   font-weight: 500;
+  line-height: 1;
   cursor: pointer;
-  margin-bottom: 0.5rem;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
 }
 
 .share-btn:hover {
-  background: var(--bg-soft);
+  background: var(--accent-soft);
+  color: var(--accent);
 }
 
   </style>
@@ -644,13 +649,6 @@ div.popup-dot { display:none !important; }
 
     <!-- HOME VIEW -->
     <div id="homeView" class="view active">
-<button id="shareAppBtn" class="share-btn">
-  📤 Share Attrack
-</button>
-
-<span id="shareStatus" style="display:none; font-size:0.85rem; color:#16a34a;">
-  Link copied!
-</span>
 
       <div class="home-grid">
         <div class="card">
@@ -781,11 +779,25 @@ div.popup-dot { display:none !important; }
       </div>
     </div>
 
-    <div class="footer">
-      <div class="version-badge">Attrack v1.0 — FYBFM Edition (Dec 2025)</div>
-      <div class="footer-credit">Made with 💻 by Jenish &amp; ChatGPT</div>
-      <img src="https://hits.sh/https://jenishestmoizavut.github.io/Attrack-FYBFM-Edition-/.svg" alt="" style="width:0;height:0;opacity:0;position:absolute;pointer-events:none;">
-    </div>
+   <div class="footer">
+  <div style="display:flex; align-items:center; gap:10px; flex-wrap:wrap;">
+    <span class="version-badge">Attrack v1.0 — FYBFM Edition (Dec 2025)</span>
+
+    <button id="shareAppBtn" class="share-btn">
+      📤 Share Attrack
+    </button>
+
+    <span id="shareStatus"
+          style="display:none; font-size:0.7rem; color:#16a34a;">
+      Link copied!
+    </span>
+  </div>
+
+  <div class="footer-credit">
+    Made with 💻 by Jenish &amp; ChatGPT
+  </div>
+</div>
+
   </div>
 
 <script>
