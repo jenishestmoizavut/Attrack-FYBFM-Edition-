@@ -5,11 +5,68 @@
   <title>Attrack — FYBFM Edition</title>
   <meta name="viewport" content="width=device-width,initial-scale=1" />
   <style>
+:root{
+  --bg: #f4f6ff;
+  --bg-soft: #fafbff;
+  --card-bg: #ffffff;
+  --border: #e5e7eb;
+  --text: #111827;
+  --text-soft: #4b5563;
+  --muted: #6b7280;
+  --accent: #4f46e5;
+  --accent-soft: #eef2ff;
+  --danger: #b91c1c;
+  --danger-soft: #fee2e2;
+  --shadow: 0 4px 18px rgba(0,0,0,0.08);
+}
+
+body.dark{
+  --bg: #020617;
+  --bg-soft: #020617;
+  --card-bg: #0b1120;
+  --border: #1f2937;
+  --text: #e5e7eb;
+  --text-soft: #cbd5f5;
+  --muted: #9ca3af;
+  --accent: #6366f1;
+  --accent-soft: #111827;
+  --danger: #ef4444;
+  --danger-soft: #7f1d1d;
+  --shadow: 0 4px 18px rgba(15,23,42,0.9);
+}
+
 /* ---------------- Global / theme variables ---------------- */
 html, body {
   scrollbar-width: thin;
   scrollbar-color: var(--accent) var(--bg-soft);
 }
+html.dark {
+  scrollbar-color: var(--accent) #020617;
+}
+/* WebKit scrollbar — must be on html */
+html::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+html::-webkit-scrollbar-track {
+  background: var(--bg-soft);
+}
+
+html::-webkit-scrollbar-thumb {
+  background: var(--accent);
+  border-radius: 999px;
+}
+
+/* Dark mode (NOW WORKS) */
+html.dark::-webkit-scrollbar-track {
+  background: #020617;
+}
+
+html.dark::-webkit-scrollbar-thumb {
+  background: #6366f1;
+}
+
 /* -------- View switching (IMPORTANT FIX) -------- */
 .view {
   display: none;
@@ -96,43 +153,6 @@ td .btn.small:hover {
   margin-top: 10px;
 }
 
-/* WebKit (Chrome, Edge, etc.) */
-body::-webkit-scrollbar { width: 8px; height: 8px; }
-body::-webkit-scrollbar-track { background: var(--bg-soft); }
-body::-webkit-scrollbar-thumb { background: var(--accent); border-radius: 999px; }
-
-/* Dark mode tweak for track so it doesn't look like a white strip */
-body.dark::-webkit-scrollbar-track { background: #020617; }
-
-:root{
-  --bg: #f4f6ff;
-  --bg-soft: #fafbff;
-  --card-bg: #ffffff;
-  --border: #e5e7eb;
-  --text: #111827;
-  --text-soft: #4b5563;
-  --muted: #6b7280;
-  --accent: #4f46e5;
-  --accent-soft: #eef2ff;
-  --danger: #b91c1c;
-  --danger-soft: #fee2e2;
-  --shadow: 0 4px 18px rgba(0,0,0,0.08);
-}
-
-body.dark{
-  --bg: #020617;
-  --bg-soft: #020617;
-  --card-bg: #0b1120;
-  --border: #1f2937;
-  --text: #e5e7eb;
-  --text-soft: #cbd5f5;
-  --muted: #9ca3af;
-  --accent: #6366f1;
-  --accent-soft: #111827;
-  --danger: #ef4444;
-  --danger-soft: #7f1d1d;
-  --shadow: 0 4px 18px rgba(15,23,42,0.9);
-}
 /* ---------------- Timetable input polish ---------------- */
 
 .timetable-table td {
@@ -907,18 +927,21 @@ div.popup-dot { display:none !important; }
       renderSubjectStats();
     }
 
-    function setTheme(theme) {
-      if (theme === "dark") {
-        document.body.classList.add("dark");
-        darkIcon.textContent = "☀️";
-        darkLabel.textContent = "Light mode";
-      } else {
-        document.body.classList.remove("dark");
-        darkIcon.textContent = "🌙";
-        darkLabel.textContent = "Dark mode";
-      }
-      localStorage.setItem(THEME_KEY, theme);
-    }
+  function setTheme(theme) {
+  if (theme === "dark") {
+    document.documentElement.classList.add("dark"); // ✅ html
+    document.body.classList.add("dark");            // ✅ body
+    darkIcon.textContent = "☀️";
+    darkLabel.textContent = "Light mode";
+  } else {
+    document.documentElement.classList.remove("dark");
+    document.body.classList.remove("dark");
+    darkIcon.textContent = "🌙";
+    darkLabel.textContent = "Dark mode";
+  }
+  localStorage.setItem(THEME_KEY, theme);
+}
+
 
     // ---------- generation logic ----------
     function regenerateFromSchedules() {
