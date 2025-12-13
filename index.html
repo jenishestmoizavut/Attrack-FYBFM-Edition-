@@ -561,6 +561,20 @@ div.popup-dot { display:none !important; }
     box-shadow: 0 -10px 30px rgba(0,0,0,0.35);
   }
 }
+.share-btn {
+  padding: 0.5rem 0.9rem;
+  border-radius: 10px;
+  border: 1px solid var(--border);
+  background: var(--card-bg);
+  color: var(--text);
+  font-weight: 500;
+  cursor: pointer;
+  margin-bottom: 0.5rem;
+}
+
+.share-btn:hover {
+  background: var(--bg-soft);
+}
 
   </style>
 </head>
@@ -630,6 +644,14 @@ div.popup-dot { display:none !important; }
 
     <!-- HOME VIEW -->
     <div id="homeView" class="view active">
+<button id="shareAppBtn" class="share-btn">
+  📤 Share Attrack
+</button>
+
+<span id="shareStatus" style="display:none; font-size:0.85rem; color:#16a34a;">
+  Link copied!
+</span>
+
       <div class="home-grid">
         <div class="card">
           <h3>Welcome back 👋</h3>
@@ -1697,6 +1719,33 @@ renderSubjectsList();
     document.addEventListener("visibilitychange", () => { if (document.visibilityState === "hidden") try { saveState(); } catch(e){} });
 
   })();
+const shareBtn = document.getElementById("shareAppBtn");
+const shareStatus = document.getElementById("shareStatus");
+
+if (shareBtn) {
+  const appLink = window.location.origin + window.location.pathname;
+
+  shareBtn.addEventListener("click", async () => {
+    if (navigator.share) {
+      try {
+        await navigator.share({
+          title: "Attrack – FYBFM Attendance Tracker",
+          text: "Track attendance easily with Attrack (no install required)",
+          url: appLink
+        });
+      } catch (e) {
+        // user cancelled – ignore
+      }
+    } else {
+      navigator.clipboard.writeText(appLink);
+      shareStatus.style.display = "inline";
+      setTimeout(() => {
+        shareStatus.style.display = "none";
+      }, 2000);
+    }
+  });
+}
+
 </script>
 </body>
 </html>
