@@ -1,0 +1,1576 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Attrack — FYBFM Edition</title>
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <style>
+/* ---------------- Global / theme variables ---------------- */
+html, body {
+  scrollbar-width: thin;
+  scrollbar-color: var(--accent) var(--bg-soft);
+}
+/* -------- View switching (IMPORTANT FIX) -------- */
+.view {
+  display: none;
+}
+
+.view.active {
+  display: block;
+}
+/* ---------------- Daily View – Lectures panel polish ---------------- */
+
+/* Soften the section title */
+#dayView h3 {
+  font-size: 0.95rem;
+  font-weight: 600;
+  letter-spacing: 0.2px;
+  margin-bottom: 10px;
+}
+
+/* Make the "Showing lectures for" line calmer */
+#selectedDateLabel {
+  font-size: 0.78rem;          /* ⬅ smaller */
+  font-weight: 500;            /* ⬅ not bold */
+  color: var(--muted);         /* ⬅ less contrast */
+  letter-spacing: 0.15px;
+}
+
+/* Reduce visual shouting of dropdown label */
+.filter-row span {
+  font-size: 0.75rem;
+  color: var(--text-soft);
+}
+
+/* Give toolbar breathing room */
+.toolbar {
+  margin-top: 10px;
+  margin-bottom: 12px;
+  gap: 8px;
+}
+
+/* Slightly relax button appearance */
+.toolbar .btn {
+  font-size: 0.75rem;
+  padding: 5px 9px;
+  opacity: 0.92;
+}
+
+/* Make table feel less boxed-in */
+table {
+  margin-top: 8px;
+}
+
+/* Reduce table density */
+th, td {
+  padding: 6px 6px;   /* ⬅ was tight */
+}
+
+/* Calm header row */
+th {
+  font-size: 0.75rem;
+  font-weight: 600;
+  letter-spacing: 0.3px;
+}
+
+/* Make inputs feel lighter */
+td input,
+td select {
+  background: var(--bg);
+}
+
+/* Reduce visual dominance of action column */
+td .btn.small {
+  opacity: 0.85;
+}
+td .btn.small:hover {
+  opacity: 1;
+}
+
+/* Add subtle separation below toolbar */
+.toolbar::after {
+  content: "";
+  display: block;
+  height: 1px;
+  background: var(--border);
+  margin-top: 10px;
+}
+
+/* WebKit (Chrome, Edge, etc.) */
+body::-webkit-scrollbar { width: 8px; height: 8px; }
+body::-webkit-scrollbar-track { background: var(--bg-soft); }
+body::-webkit-scrollbar-thumb { background: var(--accent); border-radius: 999px; }
+
+/* Dark mode tweak for track so it doesn't look like a white strip */
+body.dark::-webkit-scrollbar-track { background: #020617; }
+
+:root{
+  --bg: #f4f6ff;
+  --bg-soft: #fafbff;
+  --card-bg: #ffffff;
+  --border: #e5e7eb;
+  --text: #111827;
+  --text-soft: #4b5563;
+  --muted: #6b7280;
+  --accent: #4f46e5;
+  --accent-soft: #eef2ff;
+  --danger: #b91c1c;
+  --danger-soft: #fee2e2;
+  --shadow: 0 4px 18px rgba(0,0,0,0.08);
+}
+
+body.dark{
+  --bg: #020617;
+  --bg-soft: #020617;
+  --card-bg: #0b1120;
+  --border: #1f2937;
+  --text: #e5e7eb;
+  --text-soft: #cbd5f5;
+  --muted: #9ca3af;
+  --accent: #6366f1;
+  --accent-soft: #111827;
+  --danger: #ef4444;
+  --danger-soft: #7f1d1d;
+  --shadow: 0 4px 18px rgba(15,23,42,0.9);
+}
+/* ---------------- Timetable input polish ---------------- */
+
+.timetable-table td {
+  padding: 6px 4px;
+  background: transparent;
+}
+
+.timetable-table input[type="number"] {
+  width: 42px;
+  height: 26px;
+  text-align: center;
+
+  border-radius: 8px;
+  border: 1px solid var(--border);
+  background: var(--bg-soft);
+
+  font-size: 0.75rem;
+  font-weight: 500;
+  color: var(--text);
+
+  outline: none;
+  transition: 
+    border-color 0.15s ease,
+    background 0.15s ease,
+    box-shadow 0.15s ease;
+}
+
+/* Hover = subtle affordance */
+.timetable-table input[type="number"]:hover {
+  border-color: var(--text-soft);
+}
+
+/* Focus = clear but calm */
+.timetable-table input[type="number"]:focus {
+  border-color: var(--accent);
+  background: var(--card-bg);
+  box-shadow: 0 0 0 1px rgba(79,70,229,0.25);
+}
+
+/* Remove browser spinner noise */
+.timetable-table input::-webkit-outer-spin-button,
+.timetable-table input::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+.timetable-table input[type="number"] {
+  appearance: textfield;
+}
+
+/* ---------------- Base layout ---------------- */
+body{
+  margin:0;
+  padding:16px;
+  font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  background: var(--bg);
+  color: var(--text);
+  transition: background 0.2s ease, color 0.2s ease;
+}
+
+h1,h2,h3 { margin:0 0 8px; }
+
+.app{
+  max-width:1100px;
+  margin:0 auto;
+  background: var(--card-bg);
+  border-radius:16px;
+  padding:16px 20px 24px;
+  box-shadow: var(--shadow);
+  border:1px solid var(--border);
+}
+
+/* ---------------- Header (compact single-row) ---------------- */
+.header{
+  display:flex;
+  flex-wrap:nowrap;
+  align-items:center;
+  justify-content:space-between;
+  gap:12px;
+  padding:12px 16px;
+  margin-bottom:8px;
+  border-bottom:1px solid var(--border);
+  border-radius:12px;
+  background:transparent;
+  box-shadow:none;
+}
+
+.title-block{
+  display:flex;
+  flex-direction:column;
+  gap:4px;
+  min-width:0;
+}
+
+.title{
+  font-size:1.12rem;
+  font-weight:700;
+  display:flex;
+  align-items:center;
+  gap:8px;
+  line-height:1;
+}
+
+.badge{
+  font-size:0.75rem;
+  padding:2px 8px;
+  border-radius:999px;
+  background:var(--accent-soft);
+  color:var(--accent);
+}
+
+/* greeting (cheer) */
+.cheer{
+  font-size:0.88rem;
+  color:var(--text-soft);
+  white-space:nowrap;
+  overflow:hidden;
+  text-overflow:ellipsis;
+  max-width:56vw;
+}
+.cheer span{ font-weight:600; }
+
+/* right-hand summary */
+.summary{
+  text-align:right;
+  font-size:0.92rem;
+  min-width:230px;
+  max-width:42%;
+}
+.summary-main{ font-weight:700; font-size:1rem; color:var(--accent); }
+.summary-sub{ font-size:0.8rem; color:var(--muted); }
+
+/* ---------------- Nav ---------------- */
+.nav{
+  display:flex;
+  gap:8px;
+  flex-wrap:wrap;
+  margin-bottom:10px;
+  padding-bottom:6px;
+  align-items:center;
+  border-bottom:1px solid transparent;
+}
+.nav-btn{
+  border-radius:999px;
+  border:none;
+  padding:5px 10px;
+  font-size:0.8rem;
+  cursor:pointer;
+  display:inline-flex;
+  align-items:center;
+  gap:4px;
+  background:transparent;
+  color:var(--muted);
+  transition: background 0.15s ease, color 0.15s ease, transform 0.05s ease;
+}
+.nav-btn.active{ background:var(--accent-soft); color:var(--accent); transform:translateY(-0.5px); }
+.nav-spacer{ flex:1; }
+
+.dark-toggle{
+  border-radius:999px;
+  border:1px solid var(--border);
+  padding:4px 9px;
+  font-size:0.8rem;
+  cursor:pointer;
+  display:inline-flex;
+  align-items:center;
+  gap:4px;
+  background:var(--bg-soft);
+  color:var(--text-soft);
+}
+
+/* ---------------- Grid & cards ---------------- */
+.grid{
+  display:grid;
+  grid-template-columns: minmax(260px,320px) 1fr;
+  gap:16px;
+  margin-bottom:12px;
+}
+@media (max-width:900px){ .grid{ grid-template-columns:1fr; } .summary{ text-align:left; max-width:100%; } .cheer{ max-width:100%; white-space:normal; } .header{ flex-wrap:wrap; } }
+
+.card{
+  border-radius:12px;
+  border:1px solid var(--border);
+  background:var(--bg-soft);
+  padding:12px;
+}
+.card h3{ font-size:0.95rem; margin-bottom:6px; }
+
+/* ---------------- Inputs, buttons ---------------- */
+.field{ margin-bottom:8px; display:flex; flex-direction:column; gap:4px; }
+.field label{ font-size:0.8rem; color:var(--text-soft); }
+
+input[type="text"], input[type="date"], select{
+  padding:6px 8px;
+  border-radius:8px;
+  border:1px solid var(--border);
+  font-size:0.85rem;
+  outline:none;
+  background:var(--card-bg);
+  color:var(--text);
+}
+input[type="text"]:focus, input[type="date"]:focus, select:focus{
+  border-color:var(--accent);
+  box-shadow:0 0 0 1px rgba(79,70,229,0.25);
+}
+
+.subjects-list{ display:flex; flex-direction:column; gap:4px; max-height:180px; overflow-y:auto; padding-right:4px; }
+.subject-row{ display:flex; align-items:center; gap:4px; flex-wrap:wrap; }
+.subject-row input{ flex:1; min-width:140px; }
+
+.btn{
+  border-radius:999px;
+  border:none;
+  padding:6px 10px;
+  font-size:0.8rem;
+  cursor:pointer;
+  display:inline-flex;
+  align-items:center;
+  gap:4px;
+  background:var(--accent);
+  color:#fff;
+  transition: background 0.15s ease, transform 0.05s ease, opacity 0.1s ease;
+}
+.btn.secondary{ background:#e5e7eb; color:#111827; }
+body.dark .btn.secondary{ background:#111827; color:#e5e7eb; }
+.btn.danger{ background:var(--danger); }
+.btn.small{ padding:4px 7px; font-size:0.75rem; border-radius:999px; }
+.btn:hover{ background:#4338ca; transform:translateY(-0.5px); }
+.btn.secondary:hover{ background:#d1d5db; }
+body.dark .btn.secondary:hover{ background:#1f2937; }
+.btn.danger:hover{ background:#991b1b; }
+.btn:disabled{ opacity:0.5; cursor:not-allowed; transform:none; }
+
+/* ---------------- Calendar ---------------- */
+.calendar{ margin-top:4px; border-radius:12px; border:1px solid var(--border); background:var(--card-bg); padding:8px; }
+.cal-header{ display:flex; justify-content:space-between; align-items:center; margin-bottom:6px; font-size:0.8rem; }
+.cal-grid{ display:grid; grid-template-columns:repeat(7,1fr); gap:4px; font-size:0.75rem; }
+.cal-dow{ text-align:center; font-weight:600; color:var(--muted); }
+.cal-cell{ height:26px; border-radius:8px; text-align:center; line-height:26px; cursor:pointer; position:relative; border:1px solid transparent; }
+.cal-cell.disabled{ cursor:default; color:#9ca3af; }
+.cal-cell.has-lectures::after{ content:""; position:absolute; bottom:3px; left:50%; width:6px; height:6px; border-radius:999px; transform:translateX(-50%); background:#22c55e; }
+.cal-cell.selected{ background:var(--accent); color:#fff; border-color:var(--accent); }
+.cal-cell.today{ border-color:var(--text-soft); }
+
+/* ---------------- Tables & small UI ---------------- */
+.toolbar{ display:flex; flex-wrap:wrap; gap:6px; align-items:center; margin-bottom:6px; font-size:0.8rem;}
+.toolbar span{ color:var(--text-soft); }
+table{ width:100%; border-collapse:collapse; font-size:0.8rem; margin-top:4px; }
+th,td{ border:1px solid var(--border); padding:4px; text-align:left; vertical-align:middle; }
+th{ background:var(--accent-soft); font-weight:600; color:var(--text-soft); }
+td input[type="text"], td input[type="date"], td select{ width:100%; box-sizing:border-box; font-size:0.78rem; padding:3px 4px; }
+td .center{ text-align:center; }
+
+.tag{ font-size:0.7rem; padding:1px 6px; border-radius:999px; background:var(--danger-soft); color:var(--danger); }
+.lectures-empty, .hint{ font-size:0.75rem; color:var(--muted); margin-top:4px; }
+
+/* ---------------- Home & stats ---------------- */
+.home-grid{ display:grid; grid-template-columns: minmax(220px,1.2fr) minmax(260px,1.8fr); gap:12px; }
+@media (max-width:900px){ .home-grid{ grid-template-columns:1fr; } }
+
+.pill{ display:inline-flex; align-items:center; gap:6px; padding:4px 10px; border-radius:999px; background:var(--accent-soft); color:var(--accent); font-size:0.85rem; margin-top:4px; }
+#overallPillText{ font-weight:700; margin-left:4px; }
+
+.subject-stats-list{ display:flex; flex-direction:column; gap:6px; max-height:260px; overflow-y:auto; padding-right:4px; }
+.subject-stat-row{ display:flex; align-items:center; justify-content:space-between; gap:8px; font-size:0.8rem; padding:6px 8px; border-radius:8px; background:var(--card-bg); border:1px solid var(--border); }
+.subject-stat-name{ font-weight:600; width:90px; flex-shrink:0; }
+.subject-stat-bar{ flex:1; margin:0 8px; height:6px; border-radius:999px; background:var(--bg-soft); overflow:hidden; }
+.subject-stat-bar-inner{ height:100%; border-radius:999px; background:#22c55e; }
+.subject-stat-meta{ font-size:0.75rem; color:var(--muted); white-space:nowrap; }
+
+/* ---------------- Timetable ---------------- */
+.timetable-table{ width:100%; border-collapse:collapse; font-size:0.78rem; margin-top:4px; }
+.timetable-table th, .timetable-table td{ border:1px solid var(--border); padding:4px 6px; text-align:center; }
+.timetable-table th{ background:var(--accent-soft); }
+
+/* ---------------- Footer ---------------- */
+.footer{ margin-top:16px; font-size:0.7rem; color:var(--muted); display:flex; flex-wrap:wrap; align-items:center; justify-content:space-between; gap:6px; }
+.version-badge{ padding:2px 8px; border-radius:999px; background:var(--accent-soft); color:var(--accent); font-size:0.7rem; }
+.footer-credit{ text-align:right; opacity:0.9; }
+
+/* ---------------- Tutorial modal styles ---------------- */
+#tutorialModalBackdrop{
+  position:fixed;
+  inset:0;
+  background:rgba(2,6,23,0.6);
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  z-index:1200;
+  padding:20px;
+  display:none; /* hidden by default */
+}
+#tutorialModal{
+  width:min(760px,98%);
+  max-height:86vh;
+  overflow-y:auto;
+  background:var(--card-bg);
+  color:var(--text);
+  border-radius:12px;
+  border:1px solid var(--border);
+  box-shadow:var(--shadow);
+  padding:18px;
+  font-size:0.92rem;
+}
+#tutorialModal h2{ margin-top:0; font-size:1.1rem; }
+#tutorialModal ol{ padding-left:1.1rem; margin:8px 0 12px 0; }
+.tutorial-step{ margin-bottom:8px; }
+#tutorialActions{ display:flex; gap:8px; justify-content:flex-end; margin-top:12px; flex-wrap:wrap; }
+#tutorialModal .btn{ font-size:0.85rem; padding:7px 10px; }
+#tutorialDismissCheckbox{ margin-right:8px; transform:translateY(1px); }
+#tutorialFooterNote{ margin-top:8px; color:var(--muted); font-size:0.82rem; }
+@media (max-width:700px){ #tutorialModal{ padding:12px; font-size:0.9rem; } }
+
+/* ---------------- Compact header helpers & stray-popup fix ---------------- */
+/* Make header act as a single horizontal bar and keep nav below */
+.header{ padding:10px 12px; margin-bottom:8px; border-radius:10px; }
+.title{ font-size:1.08rem; }
+.cheer{ font-size:0.88rem; max-width:56vw; }
+
+/* Reduce overall padding slightly */
+.app{ padding:12px 16px 18px; }
+.card{ padding:10px; }
+.home-grid{ gap:10px; }
+
+/* Hide any accidental empty modal element or stray popup */
+#tutorialModalBackdrop[style*="display:flex"] > #tutorialModal:empty,
+div.popup-dot { display:none !important; }
+
+/* Slightly lighter modal backdrop if shown */
+#tutorialModalBackdrop{ background:rgba(2,6,23,0.45); }
+#tutorialModal{ max-width:760px; margin:0 12px; }
+
+/* Responsive tweaks */
+@media (max-width:900px){
+  .header{ flex-wrap:wrap; }
+  .cheer{ max-width:100%; white-space:normal; }
+  .summary{ width:100%; text-align:left; margin-top:6px; }
+}
+/* ---------------- Guided tutorial spotlight ---------------- */
+
+.tour-backdrop {
+  position: fixed;
+  inset: 0;
+  background: rgba(2, 6, 23, 0.6);
+  z-index: 1500;
+}
+
+.tour-spotlight {
+  position: absolute;
+  border-radius: 12px;
+  box-shadow:
+    0 0 0 9999px rgba(2, 6, 23, 0.6),
+    0 0 0 3px var(--accent);
+  pointer-events: none;
+  transition: all 0.25s ease;
+  z-index: 1501;
+}
+
+.tour-tooltip {
+  position: absolute;
+  max-width: 260px;
+  background: var(--card-bg);
+  color: var(--text);
+  border-radius: 10px;
+  padding: 10px 12px;
+  box-shadow: var(--shadow);
+  font-size: 0.82rem;
+  z-index: 1502;
+}
+
+.tour-tooltip h4 {
+  margin: 0 0 6px;
+  font-size: 0.85rem;
+}
+
+.tour-tooltip button {
+  margin-top: 8px;
+}
+@media (max-width: 768px) {
+  .tour-tooltip {
+    border-radius: 14px;
+    font-size: 0.85rem;
+    box-shadow: 0 -10px 30px rgba(0,0,0,0.35);
+  }
+}
+
+  </style>
+</head>
+<body>
+  <div class="app">
+
+    <!-- ----------------- Header + Nav (REPLACED) ----------------- -->
+    <div class="header">
+      <div class="title-block">
+        <div class="title">
+          📚 Attrack — FYBFM Edition
+          <span class="badge">Student-first UI</span>
+        </div>
+        <div id="cheerMessage" class="cheer">
+          Welcome! Tell me your name below and we’ll keep your attendance happy and healthy. 😊
+        </div>
+      </div>
+
+      <div class="summary" aria-live="polite">
+        <div class="summary-main" id="summaryMain">0 / 0 lectures tracked</div>
+        <div class="summary-sub" id="summarySub">Set your start date and add lectures to begin.</div>
+      </div>
+    </div>
+
+    <div class="nav" role="navigation" aria-label="Main navigation">
+      <button class="nav-btn active" data-view="homeView" type="button">🏠 Home</button>
+      <button class="nav-btn" data-view="dayView" type="button">📅 Daily view</button>
+      <button class="nav-btn" data-view="timetableView" type="button">🗓 Timetable</button>
+      <button id="showTutorialNavBtn" class="nav-btn" type="button">🎓 Show tutorial</button>
+      <div class="nav-spacer"></div>
+      <button id="darkToggle" class="dark-toggle" type="button">
+        <span id="darkIcon">🌙</span>
+        <span id="darkLabel">Dark mode</span>
+      </button>
+    </div>
+    <!-- ----------------- end Header + Nav ----------------- -->
+
+    <!-- Tutorial modal (hidden by default) -->
+    <div id="tutorialModalBackdrop" aria-hidden="true" style="display:none;">
+      <div id="tutorialModal" role="dialog" aria-modal="true" aria-labelledby="tutorialTitle">
+        <h2 id="tutorialTitle">Welcome to Attrack — quick tutorial</h2>
+
+        <p class="hint">A few quick steps to view and update your attendance. Use the buttons below to try each step in the app.</p>
+
+        
+	Welcome! I, Jenish have made this small project as a way for you to start tracking your attendance! Follow the steps below to start managing your attendance effortlessly! 
+	The app has been coded such that it has included all lectures conducted so far as on <b>13/12/2025</b> (including the extra ones)!
+         <ol>
+          <li class="tutorial-step"><strong>Open Daily view & calendar</strong> — select a date to view or edit lectures.</li>
+          <li class="tutorial-step"><strong>Load lectures for any day</strong> — press <code>Load lectures (this day)</code> to generate that day's lectures.</li>
+          <li class="tutorial-step"><strong>Mark attendance</strong> — toggle the checkbox or use <code>All attended</code>/<code>All absent</code>.</li>
+          <li class="tutorial-step"><strong>Edit timetable</strong> — open <em>Timetable</em> to change weekly counts; changes auto-regenerate.</li>
+        </ol>
+
+        <div id="tutorialFooterNote">Tip: To see this tutorial again later, click <strong>Show tutorial</strong> in the top nav.</div>
+
+        <div id="tutorialActions">
+          <label style="display:inline-flex;align-items:center;margin-right:auto;">
+            <input id="tutorialDismissCheckbox" type="checkbox" />
+            Don't show this again
+          </label>
+          <button id="tutorialCloseBtn" class="btn small">Got it</button>
+          <button id="tutorialOpenDayBtn" class="btn small secondary">Open Daily view</button>
+          <button id="tutorialRegenerateBtn" class="btn small secondary">Regenerate now</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- HOME VIEW -->
+    <div id="homeView" class="view active">
+      <div class="home-grid">
+        <div class="card">
+          <h3>Welcome back 👋</h3>
+          <div class="field">
+            <label for="studentName">Your name</label>
+            <input id="studentName" type="text" placeholder="e.g. Jenish, Rocking Math Nerd 😄" />
+          </div>
+          <div class="field">
+            <label for="startDate">Start tracking from</label>
+            <input id="startDate" type="date" />
+          </div>
+          <button class="btn small secondary" id="generateTodayBtn" type="button" style="margin-top:8px;">
+            🔁 Regenerate up to today
+          </button>
+          <div class="hint" style="margin-top:8px;">
+            Set your semester start date (dd-mm-yyyy in text), then regenerate.  
+            You can also load any single future day from the Daily view.
+          </div>
+         <div id="finalAttendanceSummary">
+  <div id="overallPill" class="pill" style="margin-top:12px;">
+    🎯 Overall attendance: <span id="overallPillText">0%</span>
+  </div>
+  <div id="targetMessage" class="hint" style="margin-top:8px;"></div>
+</div>
+
+        </div>
+
+        <div class="card">
+          <h3>Per-subject overview 📊</h3>
+          <div class="subject-stats-list" id="subjectStatsList"></div>
+          <div class="hint" style="margin-top:8px;">
+            These stats are based on all generated + manual lectures since your start date.  
+            You can tweak lectures in the Daily view.
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- DAILY VIEW -->
+    <div id="dayView" class="view">
+      <div class="grid">
+        <div>
+          <div class="card" style="margin-bottom:8px;">
+            <h3>Subjects 🧠</h3>
+            <div class="subjects-list" id="subjectsList"></div>
+            <button class="btn small secondary" id="addSubjectBtn" type="button" style="margin-top:8px;">+ Add subject</button>
+            <div class="hint" style="margin-top:8px;">
+              These start with your timetable, but you can rename them or add new ones.
+            </div>
+          </div>
+
+          <div class="card">
+            <h3>Calendar 🗓️</h3>
+            <div class="calendar">
+              <div class="cal-header">
+                <button class="btn small secondary" id="prevMonthBtn" type="button">◀</button>
+                <div id="monthLabel"></div>
+                <button class="btn small secondary" id="nextMonthBtn" type="button">▶</button>
+              </div>
+              <div class="cal-grid" id="calGrid"></div>
+            </div>
+            <div class="hint" style="margin-top:8px;">
+              Tap on a date to see or edit the lectures for that day. Green dots = days with lectures.  
+              For future days, use “Load lectures (this day)” below.
+            </div>
+          </div>
+        </div>
+
+        <div class="card">
+          <h3>Lectures & attendance ✅</h3>
+
+          <div class="filter-row">
+            <span id="selectedDateLabel"></span>
+            <span style="flex:1;"></span>
+            <span>Filter subject:</span>
+            <select id="subjectFilter">
+              <option value="">All</option>
+            </select>
+          </div>
+
+          <div class="toolbar">
+            <button class="btn small secondary" id="loadDayBtn" type="button">Load lectures (this day)</button>
+            <button class="btn small" id="addLectureBtn" type="button">+ Add lecture</button>
+            <button class="btn small secondary" id="addSpecialLectureBtn" type="button">+ Add special lecture</button>
+            <button class="btn small" id="markAllAttendedBtn" type="button">All attended</button>
+            <button class="btn small secondary" id="markAllAbsentBtn" type="button">All absent</button>
+          </div>
+
+          <table>
+            <thead>
+              <tr>
+                <th style="width: 98px;">Date</th>
+                <th style="width: 120px;">Subject</th>
+                <th>Lecture title / note</th>
+                <th style="width: 70px;">Special</th>
+                <th style="width: 80px;">Attended?</th>
+                <th style="width: 60px;">Remove</th>
+              </tr>
+            </thead>
+            <tbody id="lecturesTableBody"></tbody>
+          </table>
+          <div id="lecturesEmpty" class="lectures-empty"></div>
+          <div class="hint" style="margin-top:8px;">
+            All new lectures are marked as attended by default.  
+            “All attended” / “All absent” flips the whole day in one click.
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- TIMETABLE VIEW -->
+    <div id="timetableView" class="view">
+      <div class="card">
+        <h3>Your timetable editor 🗓</h3>
+        <div class="hint">
+          Set how many lectures of each subject happen on each day.  
+          Changing this will auto-regenerate lectures (old manual + special ones stay).
+        </div>
+        <div style="overflow-x:auto; margin-top:6px;">
+          <table class="timetable-table">
+            <thead>
+              <tr>
+                <th style="text-align:left;">Subject</th>
+                <th>Mon</th><th>Tue</th><th>Wed</th><th>Thu</th><th>Fri</th><th>Sat</th>
+              </tr>
+            </thead>
+            <tbody id="timetableBody"></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <div class="footer">
+      <div class="version-badge">Attrack v1.0 — FYBFM Edition (Dec 2025)</div>
+      <div class="footer-credit">Made with 💻 by Jenish &amp; ChatGPT</div>
+      <img src="https://hits.sh/https://attrack-fybfm.netlify.app/.svg" alt="" style="width:0;height:0;opacity:0;position:absolute;pointer-events:none;">
+    </div>
+  </div>
+
+<script>
+  (function () {
+    const STORAGE_KEY = "attrack_FYBFM_v1";
+    const THEME_KEY   = "attrack_theme";
+    const VIEW_KEY    = "attrack_lastView";
+    const TARGET_ATTENDANCE = 0.75; // 75%
+
+    // small defensive cleanup: remove accidental single-character text nodes like "<" or "..."
+    (function removeAccidentalTextNodes() {
+      try {
+        const walker = document.createTreeWalker(document.body, NodeFilter.SHOW_TEXT, null, false);
+        const toRemove = [];
+        while (walker.nextNode()) {
+          const t = walker.currentNode.nodeValue && walker.currentNode.nodeValue.trim();
+          if (t === "<" || t === "..." || t === "…") toRemove.push(walker.currentNode);
+        }
+        toRemove.forEach(n => n.parentNode && n.parentNode.removeChild(n));
+      } catch (e) { /* ignore */ }
+    })();
+
+    // 🎯 Hard-coded special dates & rules (example)
+    const HOLIDAYS = new Set(["2025-11-05", "2025-12-06"]);
+    const ZERO_LECTURE_DAYS = new Set(["2025-12-10"]);
+    const EXTRA_LECTURES = [
+      { date: "2025-11-29", subjectId: "sub-ppbi", title: "Extra lecture" },
+	{ date: "2025-11-29", subjectId: "sub-ffs",  title: "FFS extra lecture" },
+      { date: "2025-12-01", subjectId: "sub-mst",  title: "MST extra lecture" },
+      { date: "2025-12-08", subjectId: "sub-mst",  title: "MST extra lecture" },
+    ];
+    const PER_SUBJECT_CANCEL = [
+      { date: "2025-11-04", subjectId: "sub-cs"   },
+      { date: "2025-11-27", subjectId: "sub-ffs"  },
+      { date: "2025-11-28", subjectId: "sub-ppbi" },
+	{ date: "2025-11-29", subjectId: "sub-ui" }, // ❌ UI cancelled
+      { date: "2025-12-05", subjectId: "sub-cs"   },
+    ];
+
+    // ---------- small helpers ----------
+    function toISODate(d) {
+      const year  = d.getFullYear();
+      const month = String(d.getMonth() + 1).padStart(2, "0");
+      const day   = String(d.getDate()).padStart(2, "0");
+      return `${year}-${month}-${day}`;
+    }
+    function parseISO(dateStr) {
+      const parts = dateStr ? dateStr.split("-") : null;
+      if (!parts || parts.length !== 3) return new Date();
+      return new Date(Number(parts[0]), Number(parts[1]) - 1, Number(parts[2]));
+    }
+    function formatDisplayDate(iso) {
+      const [y, m, d] = iso.split("-");
+      return `${d}-${m}-${y}`;
+    }
+    function escapeHtml(str) {
+      return String(str).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;")
+                        .replace(/"/g,"&quot;").replace(/'/g,"&#039;");
+    }
+    function genId(prefix) {
+      return prefix + "-" + Math.random().toString(36).slice(2,9) + "-" + Date.now().toString(36);
+    }
+
+    function defaultState() {
+  const isoStart = "2025-11-03";
+
+  return {
+    isInitialized: false,   // ✅ MUST be here
+
+    studentName: "",
+    startDate: isoStart,
+
+    subjects: [
+      { id: "sub-fa",   name: "FA",    schedule: { weeklyPattern: [{day:1,count:1},{day:3,count:1},{day:6,count:1}] } },
+      { id: "sub-ffs",  name: "FFS",   schedule: { weeklyPattern: [{day:1,count:1},{day:4,count:1}] } },
+      { id: "sub-mst",  name: "MST",   schedule: { weeklyPattern: [{day:1,count:1},{day:6,count:1}] } },
+      { id: "sub-cs",   name: "CS",    schedule: { weeklyPattern: [{day:2,count:1},{day:5,count:1}] } },
+      { id: "sub-dra",  name: "Drama", schedule: { weeklyPattern: [{day:2,count:1},{day:4,count:2}] } },
+      { id: "sub-ppbi", name: "PPBI",  schedule: { weeklyPattern: [{day:2,count:1},{day:3,count:1},{day:5,count:1}] } },
+      { id: "sub-be",   name: "BE",    schedule: { weeklyPattern: [{day:2,count:1},{day:3,count:1}] } },
+      { id: "sub-eeb",  name: "EEB",   schedule: { weeklyPattern: [{day:2,count:1},{day:5,count:1}] } },
+      { id: "sub-ui",   name: "UI",    schedule: { weeklyPattern: [{day:3,count:1},{day:6,count:1}] } },
+      { id: "sub-smo",  name: "SMO",   schedule: { weeklyPattern: [{day:4,count:2}] } },
+    ],
+
+    lectures: []
+  };
+}
+
+
+    function loadState() {
+      try {
+        const raw = localStorage.getItem(STORAGE_KEY);
+        if (!raw) return defaultState();
+        const parsed = JSON.parse(raw || "{}");
+        const defaults = defaultState();
+
+        if (!Array.isArray(parsed.subjects) || parsed.subjects.length === 0) {
+          parsed.subjects = defaults.subjects.map(s => ({
+            id: s.id, name: s.name,
+            schedule: s.schedule ? JSON.parse(JSON.stringify(s.schedule)) : { weeklyPattern: [] }
+          }));
+        } else {
+          parsed.subjects = parsed.subjects.map(s => {
+            const out = {
+              id: s.id || (s.name ? ("sub-" + s.name.toLowerCase().replace(/[^a-z0-9]+/g,"-")) : genId("sub")),
+              name: s.name || "Subject",
+              schedule: null
+            };
+            if (s && s.schedule && Array.isArray(s.schedule.weeklyPattern)) {
+              out.schedule = s.schedule;
+            } else {
+              const match = defaults.subjects.find(d =>
+                (d.id && d.id === s.id) ||
+                (d.name && s.name && d.name.toLowerCase() === s.name.toLowerCase())
+              );
+              out.schedule = match ? JSON.parse(JSON.stringify(match.schedule)) : { weeklyPattern: [] };
+            }
+            return out;
+          });
+        }
+
+        if (!Array.isArray(parsed.lectures)) parsed.lectures = [];
+        if (!parsed.startDate) parsed.startDate = defaults.startDate;
+        return parsed;
+      } catch (e) {
+        console.error("Failed to load state", e);
+        return defaultState();
+      }
+    }
+
+    let state = loadState();
+    let currentMonthDate = new Date();
+    let selectedDate = new Date();
+
+    // elements
+    const cheerMessageEl   = document.getElementById("cheerMessage");
+    const summaryMainEl    = document.getElementById("summaryMain");
+    const summarySubEl     = document.getElementById("summarySub");
+
+    const homeView         = document.getElementById("homeView");
+    const dayView          = document.getElementById("dayView");
+    const timetableView    = document.getElementById("timetableView");
+    const navButtons       = Array.from(document.querySelectorAll(".nav-btn"));
+
+    const studentNameInput = document.getElementById("studentName");
+    const startDateInput   = document.getElementById("startDate");
+    const generateTodayBtn = document.getElementById("generateTodayBtn");
+    const overallPillText  = document.getElementById("overallPillText");
+    const subjectStatsList = document.getElementById("subjectStatsList");
+    const targetMessageEl  = document.getElementById("targetMessage");
+
+    const subjectsListEl   = document.getElementById("subjectsList");
+    const addSubjectBtn    = document.getElementById("addSubjectBtn");
+
+    const monthLabelEl     = document.getElementById("monthLabel");
+    const calGridEl        = document.getElementById("calGrid");
+    const prevMonthBtn     = document.getElementById("prevMonthBtn");
+    const nextMonthBtn     = document.getElementById("nextMonthBtn");
+
+    const selectedDateLabelEl   = document.getElementById("selectedDateLabel");
+    const subjectFilterEl       = document.getElementById("subjectFilter");
+    const loadDayBtn            = document.getElementById("loadDayBtn");
+    const addLectureBtn         = document.getElementById("addLectureBtn");
+    const addSpecialLectureBtn  = document.getElementById("addSpecialLectureBtn");
+    const markAllAttendedBtn    = document.getElementById("markAllAttendedBtn");
+    const markAllAbsentBtn      = document.getElementById("markAllAbsentBtn");
+    const lecturesTableBodyEl   = document.getElementById("lecturesTableBody");
+    const lecturesEmptyEl       = document.getElementById("lecturesEmpty");
+
+    const timetableBodyEl  = document.getElementById("timetableBody");
+
+    const darkToggle       = document.getElementById("darkToggle");
+    const darkIcon         = document.getElementById("darkIcon");
+    const darkLabel        = document.getElementById("darkLabel");
+
+    // persistence & theme
+    function saveState() {
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+      renderSummary();
+      renderSubjectStats();
+    }
+
+    function setTheme(theme) {
+      if (theme === "dark") {
+        document.body.classList.add("dark");
+        darkIcon.textContent = "☀️";
+        darkLabel.textContent = "Light mode";
+      } else {
+        document.body.classList.remove("dark");
+        darkIcon.textContent = "🌙";
+        darkLabel.textContent = "Dark mode";
+      }
+      localStorage.setItem(THEME_KEY, theme);
+    }
+
+    // ---------- generation logic ----------
+    function regenerateFromSchedules() {
+      const start = parseISO(state.startDate || toISODate(new Date()));
+      const today = new Date(); today.setHours(0,0,0,0);
+
+      const manualLectures = state.lectures.filter(lec => !lec.autoGenerated);
+      const existingAuto   = state.lectures.filter(lec => lec.autoGenerated);
+      const autoByKey = {};
+      existingAuto.forEach(lec => {
+        if (!lec.date) return;
+        const d = parseISO(lec.date); d.setHours(0,0,0,0);
+        if (d < start || d > today) return;
+        const key = `${lec.date}|${lec.subjectId||""}`;
+        if (!autoByKey[key]) autoByKey[key] = [];
+        autoByKey[key].push(lec);
+      });
+      Object.values(autoByKey).forEach(arr => arr.sort((a,b)=>a.id<b.id?-1:1));
+
+      const newAuto = [];
+      let cur = new Date(start.getFullYear(), start.getMonth(), start.getDate()); cur.setHours(0,0,0,0);
+      let guard = 0;
+      while (cur <= today && guard < 5000) {
+        const iso = toISODate(cur);
+        if (!HOLIDAYS.has(iso) && !ZERO_LECTURE_DAYS.has(iso)) {
+          const dow = cur.getDay();
+          state.subjects.forEach(subj => {
+            if (!subj.schedule || !Array.isArray(subj.schedule.weeklyPattern)) return;
+            const cancelled = PER_SUBJECT_CANCEL.some(c => c.date===iso && c.subjectId===subj.id);
+            if (cancelled) return;
+            let occurrences = 0;
+            subj.schedule.weeklyPattern.forEach(p => { if (p.day===dow) occurrences += (p.count||1); });
+            if (occurrences>0) {
+              const key = `${iso}|${subj.id||""}`;
+              const existingForKey = autoByKey[key] || [];
+              for (let i=0;i<occurrences;i++){
+                if (existingForKey[i]) newAuto.push(existingForKey[i]);
+                else newAuto.push({ id: genId("lec"), date: iso, subjectId: subj.id, title:"", isSpecial:false, attended:true, autoGenerated:true });
+              }
+            }
+          });
+        }
+        cur.setDate(cur.getDate()+1); guard++;
+      }
+
+      const futureAuto = existingAuto.filter(lec => {
+        if (!lec.date) return false;
+        const d = parseISO(lec.date); d.setHours(0,0,0,0);
+        return d > today;
+      });
+
+      state.lectures = manualLectures.concat(newAuto, futureAuto);
+      applyCancellationsAndExtras();
+    }
+
+    function generateLecturesForDateInternal(subj, dateObj, avoidDuplicates) {
+      const iso = toISODate(dateObj);
+      if (HOLIDAYS.has(iso) || ZERO_LECTURE_DAYS.has(iso)) return;
+      const dow = dateObj.getDay();
+      let occurrences = 0;
+      subj.schedule.weeklyPattern.forEach(p => { if (p.day===dow) occurrences += (p.count||1); });
+      if (occurrences<=0) return;
+      const existingAuto = state.lectures.filter(lec => lec.autoGenerated && lec.date===iso && lec.subjectId===subj.id).length;
+      const toAdd = avoidDuplicates ? Math.max(0, occurrences - existingAuto) : occurrences;
+      for (let i=0;i<toAdd;i++){
+        state.lectures.push({ id: genId("lec"), date: iso, subjectId: subj.id, title:"", isSpecial:false, attended:true, autoGenerated:true });
+      }
+    }
+
+    function generateLecturesForDate(isoDate) {
+      const d = parseISO(isoDate); d.setHours(0,0,0,0);
+      state.subjects.forEach(subj => { if (!subj.schedule || !Array.isArray(subj.schedule.weeklyPattern)) return; generateLecturesForDateInternal(subj, d, true); });
+     applyCancellationsAndExtras();
+    }
+
+    function ensureMstExtras() {
+      const mstSubject = state.subjects.find(s => s.id === "sub-mst");
+      if (!mstSubject) return;
+      const mstId = mstSubject.id;
+      const EXTRA_MST_DATES = ["2025-12-01", "2025-12-08"];
+      EXTRA_MST_DATES.forEach(date => {
+        const mstAutos = state.lectures.filter(lec => lec.date===date && lec.subjectId===mstId && lec.autoGenerated===true);
+        const hasNormal = mstAutos.some(lec => !lec.isSpecial);
+        const hasSpecial = mstAutos.some(lec => lec.isSpecial);
+        if (!hasNormal) {
+          state.lectures.push({ id: genId("lec"), date, subjectId: mstId, title:"", isSpecial:false, attended:true, autoGenerated:true });
+        }
+        if (!hasSpecial) {
+          state.lectures.push({ id: genId("lec"), date, subjectId: mstId, title:"MST extra lecture", isSpecial:true, attended:true, autoGenerated:true });
+        }
+      });
+    }
+
+    function applyCancellationsAndExtras() {
+      state.lectures = state.lectures.filter(lec => {
+        if (!lec.autoGenerated) return true;
+        return !PER_SUBJECT_CANCEL.some(c => c.date===lec.date && c.subjectId===lec.subjectId);
+      });
+      EXTRA_LECTURES.forEach(extra => {
+        if (HOLIDAYS.has(extra.date) || ZERO_LECTURE_DAYS.has(extra.date)) return;
+        const exists = state.lectures.some(lec => lec.date===extra.date && lec.subjectId===extra.subjectId && lec.autoGenerated);
+        if (!exists) {
+          state.lectures.push({ id: genId("lec"), date: extra.date, subjectId: extra.subjectId, title: extra.title || "Extra lecture", isSpecial:true, attended:true, autoGenerated:true });
+        }
+      });
+      ensureMstExtras();
+    }
+
+    // rendering and UI logic (unchanged behavior)
+    function renderStudent() {
+      studentNameInput.value = state.studentName || "";
+      startDateInput.value   = state.startDate || toISODate(new Date());
+      if (state.studentName) {
+        cheerMessageEl.innerHTML = `Hey <span>${escapeHtml(state.studentName)}</span>! Let’s keep your attendance streak going strong. 🌟`;
+      } else {
+        cheerMessageEl.textContent =
+          "Welcome! Tell me your name below and we’ll keep your attendance happy and healthy. 😊";
+      }
+    }
+
+    function renderSubjectsList() {
+      subjectsListEl.innerHTML = "";
+      subjectFilterEl.innerHTML = "";
+      const allOpt = document.createElement("option");
+      allOpt.value = "";
+      allOpt.textContent = "All";
+      subjectFilterEl.appendChild(allOpt);
+
+      state.subjects.forEach((subj) => {
+        const row = document.createElement("div");
+        row.className = "subject-row";
+
+        const input = document.createElement("input");
+        input.type = "text";
+        input.value = subj.name;
+        input.placeholder = "Subject name";
+        const originalName = subj.name;
+
+        input.addEventListener("change", () => {
+          const newName = input.value.trim();
+          const nameChanged = newName !== originalName;
+          subj.name = newName;
+          if (nameChanged) {
+            const shouldDelete = confirm("You changed this subject name.\n\nDo you want to remove all existing lectures for the old subject and start fresh for \"" + newName + "\"?");
+            if (shouldDelete) {
+              state.lectures = state.lectures.filter(lec => lec.subjectId !== subj.id);
+            }
+          }
+          saveState();
+          renderLectures();
+          renderSubjectStats();
+          renderTimetable();
+        });
+
+        const timetableBtn = document.createElement("button");
+        timetableBtn.type = "button";
+        timetableBtn.className = "btn small secondary";
+        timetableBtn.textContent = "Timetable";
+        timetableBtn.title = "Jump to timetable editor for this subject";
+        timetableBtn.addEventListener("click", () => switchView("timetableView"));
+
+        const delBtn = document.createElement("button");
+        delBtn.type = "button";
+        delBtn.className = "btn small danger";
+        delBtn.textContent = "✕";
+        delBtn.title = "Remove subject and all its lectures";
+        delBtn.addEventListener("click", () => {
+          if (!confirm("Remove this subject AND all its lectures? This cannot be undone.")) return;
+          const removedId = subj.id;
+          state.subjects = state.subjects.filter((s) => s.id !== removedId);
+          state.lectures = state.lectures.filter(lec => lec.subjectId !== removedId);
+          saveState();
+          renderSubjectsList();
+          renderLectures();
+          renderTimetable();
+          renderSubjectStats();
+        });
+
+        row.appendChild(input);
+        row.appendChild(timetableBtn);
+        row.appendChild(delBtn);
+        subjectsListEl.appendChild(row);
+
+        const opt = document.createElement("option");
+        opt.value = subj.id;
+        opt.textContent = subj.name || "Subject";
+        subjectFilterEl.appendChild(opt);
+      });
+    }
+
+    function renderCalendar() {
+      const year = currentMonthDate.getFullYear();
+      const month = currentMonthDate.getMonth();
+      const firstOfMonth = new Date(year, month, 1);
+      const firstDay = firstOfMonth.getDay();
+      const daysInMonth = new Date(year, month + 1, 0).getDate();
+      const monthNames = ["January","February","March","April","May","June","July","August","September","October","November","December"];
+      const dow = ["Sun","Mon","Tue","Wed","Thu","Fri","Sat"];
+      const todayISO = toISODate(new Date());
+      const selectedISO = toISODate(selectedDate);
+      monthLabelEl.textContent = `${monthNames[month]} ${year}`;
+      calGridEl.innerHTML = "";
+      dow.forEach((d) => {
+        const el = document.createElement("div");
+        el.className = "cal-dow";
+        el.textContent = d;
+        calGridEl.appendChild(el);
+      });
+      const dateToHasLectures = {};
+      state.lectures.forEach((lec) => { if (lec.date) dateToHasLectures[lec.date] = true; });
+      const totalCells = 42;
+      let dayCounter = 1;
+      for (let i = 0; i < totalCells; i++) {
+        const cell = document.createElement("div");
+        cell.className = "cal-cell";
+        if (i < firstDay || dayCounter > daysInMonth) {
+          cell.classList.add("disabled");
+          cell.textContent = "";
+        } else {
+          const d = dayCounter;
+          const iso = `${year}-${String(month + 1).padStart(2, "0")}-${String(d).padStart(2, "0")}`;
+          cell.textContent = d;
+          if (iso === todayISO) cell.classList.add("today");
+          if (iso === selectedISO) cell.classList.add("selected");
+          if (dateToHasLectures[iso]) cell.classList.add("has-lectures");
+          cell.addEventListener("click", () => {
+            selectedDate = parseISO(iso);
+            renderCalendar();
+            renderLectures();
+          });
+          dayCounter++;
+        }
+        calGridEl.appendChild(cell);
+      }
+    }
+
+    function renderLectures() {
+      const selectedISO = toISODate(selectedDate);
+      selectedDateLabelEl.textContent = `Showing lectures for: ${formatDisplayDate(selectedISO)}`;
+      const filterSubId = subjectFilterEl.value || "";
+      let todaysLectures = state.lectures.filter((lec) => lec.date === selectedISO);
+      if (filterSubId) todaysLectures = todaysLectures.filter(lec => lec.subjectId === filterSubId);
+      todaysLectures.sort((a, b) => (a.id > b.id ? 1 : -1));
+      lecturesTableBodyEl.innerHTML = "";
+      if (todaysLectures.length === 0) {
+        lecturesEmptyEl.textContent = "No lectures for this day with this filter. Load from timetable or add manually.";
+      } else {
+        lecturesEmptyEl.textContent = "";
+      }
+      todaysLectures.forEach((lec) => {
+        const tr = document.createElement("tr");
+        const tdDate = document.createElement("td");
+        const dateInput = document.createElement("input");
+        dateInput.type = "date";
+        dateInput.value = lec.date || selectedISO;
+        dateInput.addEventListener("change", () => { lec.date = dateInput.value || selectedISO; saveState(); renderCalendar(); renderLectures(); });
+        tdDate.appendChild(dateInput);
+        tr.appendChild(tdDate);
+
+        const tdSubject = document.createElement("td");
+        const select = document.createElement("select");
+        const blankOpt = document.createElement("option");
+        blankOpt.value = ""; blankOpt.textContent = "— none —"; select.appendChild(blankOpt);
+        state.subjects.forEach((subj) => { const opt = document.createElement("option"); opt.value = subj.id; opt.textContent = subj.name || "Subject"; select.appendChild(opt); });
+        select.value = lec.subjectId || "";
+        select.addEventListener("change", () => { lec.subjectId = select.value || ""; saveState(); renderSubjectStats(); });
+        tdSubject.appendChild(select); tr.appendChild(tdSubject);
+
+        const tdTitle = document.createElement("td");
+        const titleInput = document.createElement("input");
+        titleInput.type = "text"; titleInput.placeholder = "e.g. Tutorial, Lab, Unit 2..."; titleInput.value = lec.title || "";
+        titleInput.addEventListener("input", () => { lec.title = titleInput.value; saveState(); });
+        tdTitle.appendChild(titleInput); tr.appendChild(tdTitle);
+
+        const tdSpecial = document.createElement("td"); tdSpecial.className = "center";
+        const specialTag = document.createElement("span");
+        if (lec.isSpecial) { specialTag.className = "tag"; specialTag.textContent = "Special"; }
+        const toggleBtn = document.createElement("button"); toggleBtn.type = "button"; toggleBtn.className = "btn small secondary";
+        toggleBtn.textContent = lec.isSpecial ? "Make normal" : "Make special";
+        toggleBtn.addEventListener("click", () => { lec.isSpecial = !lec.isSpecial; saveState(); renderLectures(); renderCalendar(); });
+        tdSpecial.appendChild(specialTag); if (lec.isSpecial) tdSpecial.appendChild(document.createElement("br")); tdSpecial.appendChild(toggleBtn); tr.appendChild(tdSpecial);
+
+        const tdAtt = document.createElement("td"); tdAtt.className = "center";
+        const cb = document.createElement("input"); cb.type = "checkbox"; cb.checked = !!lec.attended;
+        cb.addEventListener("change", () => { lec.attended = cb.checked; saveState(); });
+        tdAtt.appendChild(cb); tr.appendChild(tdAtt);
+
+        const tdDel = document.createElement("td"); tdDel.className = "center";
+        const delBtn = document.createElement("button"); delBtn.type = "button"; delBtn.className = "btn small danger"; delBtn.textContent = "✕";
+        delBtn.addEventListener("click", () => { if (!confirm("Remove this lecture?")) return; state.lectures = state.lectures.filter((x) => x.id !== lec.id); saveState(); renderLectures(); renderCalendar(); });
+        tdDel.appendChild(delBtn); tr.appendChild(tdDel);
+
+        lecturesTableBodyEl.appendChild(tr);
+      });
+
+      renderSummary();
+    }
+
+    function formatPct(pct) {
+      const rounded = Number(pct.toFixed(2));
+      return rounded === 100 ? "100%" : `${rounded.toFixed(2)}%`;
+    }
+
+    function renderSummary() {
+      const start = state.startDate || toISODate(new Date());
+      const all = state.lectures.filter((lec) => lec.date && lec.date >= start);
+      const attended = all.filter((lec) => lec.attended);
+      const total = all.length;
+      const attendedCount = attended.length;
+      const frac = total > 0 ? (attendedCount / total) : 0;
+      const pct = frac * 100;
+      summaryMainEl.textContent = `${attendedCount} / ${total} lectures attended`;
+      if (!total) {
+        summarySubEl.textContent = "Once your timetable lectures generate, your attendance percentage will show up here.";
+      } else {
+        summarySubEl.textContent = `Since ${formatDisplayDate(start)}, your attendance is ${formatPct(pct)} 🎯`;
+      }
+      overallPillText.textContent = formatPct(pct);
+
+      if (targetMessageEl) {
+        const target = TARGET_ATTENDANCE;
+        const targetPct = Math.round(target * 100);
+        if (!total) {
+          targetMessageEl.textContent = `As you start attending lectures, I'll tell you how many you need to attend to stay above ${targetPct}%.`;
+        } else {
+          if (frac + 1e-9 < target) {
+            const neededRaw = (target * total - attendedCount) / (1 - target);
+            const needed = Math.max(0, Math.ceil(neededRaw));
+            if (needed <= 0) {
+              targetMessageEl.textContent = `You're very close to ${targetPct}%. Try attending the next lecture to reach atleast ${targetPct}%.`;
+            } else if (needed === 1) {
+              targetMessageEl.textContent = `Attend the next 1 lecture in a row (no absences) to reach atleast ${targetPct}%.`;
+            } else {
+              targetMessageEl.textContent = `Attend the next ${needed} lectures in a row (no absences) to reach atleast ${targetPct}%.`;
+            }
+          } else {
+            const remainingMargin = attendedCount - target * total;
+            const maxMissRaw = remainingMargin / target;
+            const maxMiss = Math.max(0, Math.floor(maxMissRaw + 1e-9));
+            if (maxMiss === 0) {
+              targetMessageEl.textContent = `You're just at or slightly above ${targetPct}%. Try not to miss the next lecture.`;
+            } else if (maxMiss === 1) {
+              targetMessageEl.textContent = `You can afford to miss 1 lecture and still stay at atleast ${targetPct}% (if you attend everything else).`;
+            } else {
+              targetMessageEl.textContent = `You can afford to miss about ${maxMiss} lectures and still stay at atleast ${targetPct}% (if you don't miss more than that).`;
+            }
+          }
+        }
+      }
+    }
+
+    function renderSubjectStats() {
+      const start = state.startDate || toISODate(new Date());
+      const all = state.lectures.filter((lec) => lec.date && lec.date >= start);
+      subjectStatsList.innerHTML = "";
+      state.subjects.forEach(subj => {
+        const subjectLectures = all.filter(lec => lec.subjectId === subj.id);
+        const attended = subjectLectures.filter(lec => lec.attended);
+        const total = subjectLectures.length;
+        const att = attended.length;
+        const pct = total > 0 ? (att / total) * 100 : 0;
+        const row = document.createElement("div"); row.className = "subject-stat-row";
+        const nameEl = document.createElement("div"); nameEl.className = "subject-stat-name"; nameEl.textContent = subj.name || "Subject";
+        const bar = document.createElement("div"); bar.className = "subject-stat-bar";
+        const inner = document.createElement("div"); inner.className = "subject-stat-bar-inner"; inner.style.width = `${pct}%`;
+        bar.appendChild(inner);
+        const meta = document.createElement("div"); meta.className = "subject-stat-meta";
+        meta.textContent = total ? `${att}/${total} • ${formatPct(pct)}` : "No lectures yet";
+        row.appendChild(nameEl); row.appendChild(bar); row.appendChild(meta);
+        subjectStatsList.appendChild(row);
+      });
+    }
+
+    function renderTimetable() {
+      timetableBodyEl.innerHTML = "";
+      state.subjects.forEach(subj => {
+        const tr = document.createElement("tr");
+        const nameTd = document.createElement("td"); nameTd.style.textAlign = "left"; nameTd.textContent = subj.name || "Subject"; tr.appendChild(nameTd);
+        if (!subj.schedule) subj.schedule = { weeklyPattern: [] };
+        if (!Array.isArray(subj.schedule.weeklyPattern)) subj.schedule.weeklyPattern = [];
+        for (let dayIndex = 1; dayIndex <= 6; dayIndex++) {
+          const td = document.createElement("td");
+          const existing = subj.schedule.weeklyPattern.find(p => p.day === dayIndex);
+          const count = existing ? existing.count : 0;
+          const input = document.createElement("input");
+          input.type = "number"; input.min = "0"; input.max = "6"; input.value = count;
+          input.addEventListener("change", () => {
+            let val = parseInt(input.value, 10); if (isNaN(val) || val < 0) val = 0; if (val > 6) val = 6; input.value = val;
+            const idx = subj.schedule.weeklyPattern.findIndex(p => p.day === dayIndex);
+            if (val === 0) { if (idx !== -1) subj.schedule.weeklyPattern.splice(idx, 1); }
+            else { if (idx === -1) subj.schedule.weeklyPattern.push({ day: dayIndex, count: val }); else subj.schedule.weeklyPattern[idx].count = val; }
+           if (state.isInitialized) {
+  regenerateFromSchedules();
+  saveState();
+}
+ renderCalendar(); renderLectures();
+          });
+          td.appendChild(input); tr.appendChild(td);
+        }
+        timetableBodyEl.appendChild(tr);
+      });
+    }
+
+    function switchView(viewId) {
+      [homeView, dayView, timetableView].forEach(v => v.classList.toggle("active", v.id === viewId));
+      navButtons.forEach(btn => btn.classList.toggle("active", btn.dataset.view === viewId));
+      localStorage.setItem(VIEW_KEY, viewId);
+    }
+
+    // Events
+    studentNameInput.addEventListener("input", () => { state.studentName = studentNameInput.value.trim(); saveState(); renderStudent(); });
+    startDateInput.addEventListener("change", () => {
+  state.startDate = startDateInput.value || toISODate(new Date());
+  state.isInitialized = true;   // ✅ STEP 3 (here too)
+  regenerateFromSchedules();
+  saveState();
+  renderCalendar();
+  renderLectures();
+});
+
+  generateTodayBtn.addEventListener("click", () => {
+  state.isInitialized = true;   // ✅ STEP 3 (core line)
+  regenerateFromSchedules();
+  saveState();
+  renderCalendar();
+  renderLectures();
+});
+    loadDayBtn.addEventListener("click", () => { const iso = toISODate(selectedDate); generateLecturesForDate(iso); saveState(); renderCalendar(); renderLectures(); });
+    addSubjectBtn.addEventListener("click", () => { state.subjects.push({ id: genId("sub"), name:"New subject", schedule:{ weeklyPattern:[] } }); saveState(); renderSubjectsList(); renderTimetable(); });
+    prevMonthBtn.addEventListener("click", () => { currentMonthDate = new Date(currentMonthDate.getFullYear(), currentMonthDate.getMonth()-1,1); renderCalendar(); });
+    nextMonthBtn.addEventListener("click", () => { currentMonthDate = new Date(currentMonthDate.getFullYear(), currentMonthDate.getMonth()+1,1); renderCalendar(); });
+    addLectureBtn.addEventListener("click", () => { const iso = toISODate(selectedDate); const firstSubject = state.subjects[0] || null; state.lectures.push({ id: genId("lec"), date: iso, subjectId: firstSubject ? firstSubject.id : "", title:"", isSpecial:false, attended:true, autoGenerated:false }); saveState(); renderLectures(); renderCalendar(); });
+    addSpecialLectureBtn.addEventListener("click", () => { const iso = toISODate(selectedDate); const firstSubject = state.subjects[0] || null; state.lectures.push({ id: genId("lec"), date: iso, subjectId: firstSubject ? firstSubject.id : "", title:"Special lecture", isSpecial:true, attended:true, autoGenerated:false }); saveState(); renderLectures(); renderCalendar(); });
+    markAllAttendedBtn.addEventListener("click", () => { const iso = toISODate(selectedDate); let changed=false; state.lectures.forEach(lec=>{ if (lec.date===iso && !lec.attended){ lec.attended=true; changed=true; }}); if (changed){ saveState(); renderLectures(); }});
+    markAllAbsentBtn.addEventListener("click", () => { const iso = toISODate(selectedDate); let changed=false; state.lectures.forEach(lec=>{ if (lec.date===iso && lec.attended){ lec.attended=false; changed=true; }}); if (changed){ saveState(); renderLectures(); }});
+    subjectFilterEl.addEventListener("change", () => renderLectures());
+    navButtons.forEach(btn => btn.addEventListener("click", () => switchView(btn.dataset.view)));
+    darkToggle.addEventListener("click", () => { const isDark = document.body.classList.contains("dark"); setTheme(isDark ? "light" : "dark"); });
+
+    // Tutorial wiring: ensure the Show tutorial nav button exists, wire modal
+    (function tutorialInit() {
+      const TUTORIAL_KEY = "attrack_tutorial_seen";
+      const backdrop = document.getElementById("tutorialModalBackdrop");
+      const closeBtn = document.getElementById("tutorialCloseBtn");
+      const check = document.getElementById("tutorialDismissCheckbox");
+      const openDayBtn = document.getElementById("tutorialOpenDayBtn");
+      const regenBtn = document.getElementById("tutorialRegenerateBtn");
+      const showBtn = document.getElementById("showTutorialNavBtn");
+
+  if (showBtn) {
+  showBtn.addEventListener("click", () => {
+    startLiveTutorial();   // 🎯 launch guided tour instead
+  });
+}
+
+
+      if (closeBtn) closeBtn.addEventListener("click", () => {
+        if (!backdrop) return;
+        if (check && check.checked) localStorage.setItem(TUTORIAL_KEY, "1");
+        backdrop.style.display = "none"; backdrop.setAttribute("aria-hidden", "true");
+      });
+
+      if (openDayBtn) openDayBtn.addEventListener("click", () => {
+        if (backdrop) { backdrop.style.display = "none"; backdrop.setAttribute("aria-hidden","true"); }
+        switchView("dayView"); renderCalendar(); renderLectures();
+      });
+
+      if (regenBtn) regenBtn.addEventListener("click", () => {
+        const gen = document.getElementById("generateTodayBtn"); if (gen) gen.click();
+        if (check && check.checked && backdrop) { backdrop.style.display = "none"; backdrop.setAttribute("aria-hidden","true"); }
+      });
+
+      try {
+        const seen = localStorage.getItem(TUTORIAL_KEY);
+        if (!seen && backdrop) setTimeout(()=>{ backdrop.style.display = "flex"; backdrop.setAttribute("aria-hidden","false"); }, 300);
+      } catch(e){}
+    })();
+// ---------------- Guided Tutorial Engine ----------------
+function isMobileTutorial() {
+  return window.matchMedia("(max-width: 768px)").matches;
+}
+
+const tourSteps = [
+  {
+    view: "homeView",
+    selector: "#studentName",
+    title: "Enter your name",
+    text: "Start by entering your name here."
+  },
+  {
+    view: "homeView",
+    selector: "#startDate",
+    title: "Set your start date",
+    text: "Choose the date from which attendance tracking begins. I have already coded our semester start date."
+  },
+{
+    view: "dayView",
+    selector: "#subjectsList",
+    title: "Check your subjects",
+    text: "Subjects may differ across FYBFM students. If a subject like Drama doesn’t apply to you, you can rename or remove it here."
+  },
+  {
+    view: "dayView",
+    selector: "#loadDayBtn",
+    title: "Load lectures for a day",
+    text: "Loads timetable lectures for the selected date. We will adjust it with our timetable in a bit! Your lectures are automatically loaded as per the date on your phone!"
+  },
+  {
+    view: "dayView",
+    selector: "#markAllAttendedBtn",
+    title: "Mark all attended",
+    text: "Use this when you attended every lecture on the selected day."
+  },
+  {
+    view: "dayView",
+    selector: "#markAllAbsentBtn",
+    title: "Mark all absent",
+    text: "Use this if you missed all lectures on that day."
+  },
+  {
+    view: "timetableView",
+    selector: "#timetableBody",
+    title: "Edit timetable",
+    text: "Change how many lectures happen each day. I have coded FYBFM's timetable as per Drama students."
+  }, 
+{
+view: "dayView",
+  selector: "#calGrid",
+  title: "Update attendance from memory",
+  text: "Using your SAP portal's PDF, update your attendance. Select a date, then update attendance for that day based on what you actually recall."
+},
+{
+  view: "homeView",
+  selector: "#finalAttendanceSummary",
+  title: "Your attendance safety buffer",
+  text: "You're all set! This shows your overall attendance and how many lectures you can still miss while staying above the required percentage. If you are still confused, you have my number - feel free to ask!"
+}
+
+];
+
+
+let tourIndex = 0;
+let tourSpotlight, tourTooltip;
+
+function startLiveTutorial() {
+  tourIndex = 0;
+  showTourStep();
+}
+
+function showTourStep() {
+  const step = tourSteps[tourIndex];
+  if (!step) return endLiveTutorial();
+
+  switchView(step.view);
+
+  setTimeout(() => {
+    const target = document.querySelector(step.selector);
+    if (!target) return;
+
+ const mobile = isMobileTutorial();
+const rect = target.getBoundingClientRect();
+
+// Scroll element into view on mobile
+if (mobile) {
+  target.scrollIntoView({ behavior: "smooth", block: "center" });
+}
+
+// DESKTOP spotlight only
+if (!mobile) {
+  if (!tourSpotlight) {
+    tourSpotlight = document.createElement("div");
+    tourSpotlight.className = "tour-spotlight";
+    document.body.appendChild(tourSpotlight);
+  }
+
+  tourSpotlight.style.top = `${rect.top - 6}px`;
+  tourSpotlight.style.left = `${rect.left - 6}px`;
+  tourSpotlight.style.width = `${rect.width + 12}px`;
+  tourSpotlight.style.height = `${rect.height + 12}px`;
+} else {
+  if (tourSpotlight) tourSpotlight.remove();
+  tourSpotlight = null;
+}
+
+// TOOLTIP
+if (tourTooltip) tourTooltip.remove();
+tourTooltip = document.createElement("div");
+tourTooltip.className = "tour-tooltip";
+tourTooltip.innerHTML = `
+  <h4>${step.title}</h4>
+  <div>${step.text}</div>
+  <button class="btn small" id="tourNextBtn">
+    ${tourIndex === tourSteps.length - 1 ? "Finish" : "Next"}
+  </button>
+`;
+
+document.body.appendChild(tourTooltip);
+
+// Position tooltip
+if (mobile) {
+  tourTooltip.style.position = "fixed";
+  tourTooltip.style.left = "12px";
+  tourTooltip.style.right = "12px";
+  tourTooltip.style.bottom = "16px";
+} else {
+  const tipRect = tourTooltip.getBoundingClientRect();
+  tourTooltip.style.top = `${rect.bottom + 12}px`;
+  tourTooltip.style.left =
+    `${Math.min(rect.left, window.innerWidth - tipRect.width - 12)}px`;
+}
+
+
+    document.getElementById("tourNextBtn").onclick = () => {
+      tourIndex++;
+      showTourStep();
+    };
+  }, 200);
+}
+
+function endLiveTutorial() {
+  if (tourSpotlight) tourSpotlight.remove();
+  if (tourTooltip) tourTooltip.remove();
+  tourSpotlight = null;
+  tourTooltip = null;
+
+  // Return user to Home at the end
+  switchView("homeView");
+}
+
+
+    // boot
+    (function init(){
+      const storedTheme = localStorage.getItem(THEME_KEY) || "light";
+      setTheme(storedTheme);
+      const storedView = localStorage.getItem(VIEW_KEY);
+      if (storedView) switchView(storedView);
+      if (!state.startDate) state.startDate = "2025-11-03";
+      regenerateFromSchedules();
+      saveState();
+      renderStudent();
+      renderSubjectsList();
+      renderCalendar();
+      renderLectures();
+      renderSubjectStats();
+      renderTimetable();
+    })();
+
+    // persistence helpers
+    window.addEventListener("beforeunload", () => { try { saveState(); } catch(e){} });
+    document.addEventListener("visibilitychange", () => { if (document.visibilityState === "hidden") try { saveState(); } catch(e){} });
+
+  })();
+</script>
+</body>
+</html>
