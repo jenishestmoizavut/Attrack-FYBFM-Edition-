@@ -1460,9 +1460,10 @@ if (viewId === "dayView") {
   selectedDate = new Date();
   selectedDate.setHours(0, 0, 0, 0);
 
-  subjectFilterEl.value = ""; // ✅ reset filter
 
   autoLoadTodayLectures();
+
+  subjectFilterEl.value = ""; // ✅ reset filter  
   renderCalendar();
   renderLectures();
 }
