@@ -941,6 +941,8 @@ return parsed;
       }
     }
 function autoLoadTodayLectures() {
+  if (!state.isInitialized) return; // ⬅ CRITICAL LINE
+
   const today = new Date();
   today.setHours(0, 0, 0, 0);
   const todayISO = toISODate(today);
@@ -959,8 +961,6 @@ function autoLoadTodayLectures() {
     let currentMonthDate = new Date();
     let selectedDate = new Date();
 autoLoadTodayLectures();
-renderCalendar();
-renderLectures();
 
 
     // elements
