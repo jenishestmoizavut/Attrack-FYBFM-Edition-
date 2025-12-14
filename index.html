@@ -1765,10 +1765,11 @@ selectedDate = new Date();
 selectedDate.setHours(0, 0, 0, 0);
 
 
-subjectFilterEl.value = ""; // ✅ RESET STALE FILTER
+
 
 renderStudent();
 renderSubjectsList();
+subjectFilterEl.value = ""; // ✅ RESET STALE FILTER
 renderCalendar();
 renderLectures();
       renderSubjectStats();
