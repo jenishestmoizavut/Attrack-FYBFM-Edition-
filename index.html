@@ -1781,5 +1781,28 @@ if (shareBtn) {
   alt="Hits"
   style="display:none"
 />
+<script>
+  if ("serviceWorker" in navigator) {
+    navigator.serviceWorker.register("./sw.js");
+  }
+</script>
+<script>
+(function () {
+  try {
+    const today = new Date().toISOString().slice(0, 10);
+    const lastPing = localStorage.getItem("attrack_last_ping");
+
+    if (lastPing !== today) {
+      fetch(
+        "https://hits.sh/jenishestmoizavut.github.io/Attrack-FYBFM-Edition-/.svg",
+        { cache: "no-store" }
+      );
+      localStorage.setItem("attrack_last_ping", today);
+    }
+  } catch (e) {
+    // fail silently — never block the app
+  }
+})();
+</script>
 </body>
 </html>
