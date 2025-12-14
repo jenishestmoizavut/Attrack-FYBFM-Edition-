@@ -1460,11 +1460,12 @@ if (viewId === "dayView") {
   selectedDate = new Date();
   selectedDate.setHours(0, 0, 0, 0);
 
+  subjectFilterEl.value = ""; // ✅ reset filter
+
   autoLoadTodayLectures();
   renderCalendar();
   renderLectures();
 }
-
       localStorage.setItem(VIEW_KEY, viewId);
     }
 
@@ -1761,11 +1762,12 @@ function endLiveTutorial() {
 }
 autoLoadTodayLectures();
 
-      renderStudent();
-      renderSubjectsList();
-      renderCalendar();
+subjectFilterEl.value = ""; // ✅ RESET STALE FILTER
+
+renderStudent();
 renderSubjectsList();
-      renderLectures();
+renderCalendar();
+renderLectures();
       renderSubjectStats();
       renderTimetable();
     })();
