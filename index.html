@@ -960,7 +960,6 @@ function autoLoadTodayLectures() {
     let state = loadState();
     let currentMonthDate = new Date();
     let selectedDate = new Date();
-autoLoadTodayLectures();
 
 
     // elements
@@ -1760,6 +1759,7 @@ function endLiveTutorial() {
   state.isInitialized = true;
   saveState();
 }
+autoLoadTodayLectures();
 
       renderStudent();
       renderSubjectsList();
