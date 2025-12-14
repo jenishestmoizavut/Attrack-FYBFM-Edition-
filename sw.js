@@ -1,4 +1,4 @@
-const CACHE_NAME = "attrack-v1";
+const CACHE_NAME = "attrack-cache-v2"; // ⬅ change version
 
 self.addEventListener("install", event => {
   event.waitUntil(
@@ -21,3 +21,4 @@ self.addEventListener("fetch", event => {
     })
   );
 });
+
