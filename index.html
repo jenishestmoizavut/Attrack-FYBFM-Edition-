@@ -1869,6 +1869,10 @@ if (!state.isInitialized) {
   state.isInitialized = true;
   saveState();
 }
+if (state.isInitialized) {
+  regenerateFromSchedules();
+  saveState();
+}
 
 autoLoadTodayLectures();
 selectedDate = new Date();
