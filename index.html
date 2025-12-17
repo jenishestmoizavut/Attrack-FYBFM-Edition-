@@ -601,10 +601,41 @@ div.popup-dot { display:none !important; }
   }
 }
 @media (max-width: 768px) {
-  .footer > div {
+  .footer {
+    position: sticky;
+    bottom: 0;
+    z-index: 50;
+    background: var(--card-bg);
+    border-top: 1px solid var(--border);
+    padding: 8px 10px;
+  }
+
+  .footer-actions {
     flex-direction: column;
     align-items: stretch;
   }
+
+  .footer-actions .share-btn {
+    width: 100%;
+    justify-content: center;
+  }
+
+  .footer-actions .version-badge {
+    width: 100%;
+    text-align: center;
+  }
+
+  .app {
+    padding-bottom: 80px;
+  }
+}
+
+.footer-actions {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+}
 
   .footer .share-btn {
     width: 100%;
@@ -816,7 +847,7 @@ div.popup-dot { display:none !important; }
     </div>
 
    <div class="footer">
-  <div style="display:flex; align-items:center; gap:10px; flex-wrap:wrap;">
+  <div class="footer-actions">
     <span class="version-badge">Attrack v1.0 — FYBFM Edition (Dec 2025)</span>
 
     <button id="exportAttendanceBtn" class="share-btn">
