@@ -665,7 +665,50 @@ div.popup-dot { display:none !important; }
   }
 }
 
+/* Mobile-Specific Vibe Fixes */
+@media (max-width: 600px) {
+  .app-container {
+    flex-direction: column; /* Stack vertically instead of side-by-side */
+    height: auto;
+    padding-bottom: 80px; /* Make room for the bottom nav */
+  }
 
+  .sidebar {
+    width: 100% !important;
+    height: auto;
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    z-index: 1000;
+    flex-direction: row; /* Turn the vertical menu into a horizontal row */
+    justify-content: space-around;
+    padding: 10px 5px;
+    border-right: none;
+    border-top: 1px solid var(--border);
+    background: var(--card-bg);
+  }
+
+  .sidebar-nav {
+    flex-direction: row !important; /* Icons sit side-by-side */
+    width: 100%;
+    gap: 5px;
+  }
+
+  .nav-btn {
+    flex: 1;
+    justify-content: center;
+    padding: 12px 5px;
+    font-size: 12px;
+  }
+
+  /* Hide the title/logo in the sidebar on mobile to save space */
+  .sidebar h2 { display: none; }
+
+  /* Make the main content take the full screen width */
+  .main-content {
+    padding: 15px;
+  }
+}
   </style>
 </head>
 <body>
