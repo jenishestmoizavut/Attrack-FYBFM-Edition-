@@ -555,51 +555,47 @@ div.popup-dot { display:none !important; }
 .tour-tooltip button {
   margin-top: 8px;
 }
-@media (max-width: 768px) {
-  .tour-tooltip {
-    border-radius: 14px;
-    font-size: 0.85rem;
-    box-shadow: 0 -10px 30px rgba(0,0,0,0.35);
-  }
+/* ================= FOOTER ================= */
+
+.footer {
+  margin-top: 16px;
+  font-size: 0.7rem;
+  color: var(--muted);
 }
+
+.footer-actions {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+}
+
 .share-btn {
-  padding: 4px 10px;
+  padding: 6px 12px;
   border-radius: 999px;
   border: 1px solid var(--border);
   background: var(--bg-soft);
   color: var(--text-soft);
   font-size: 0.75rem;
-  font-weight: 500;
-  line-height: 1;
   cursor: pointer;
   display: inline-flex;
   align-items: center;
-  gap: 4px;
+  justify-content: center;
 }
 
 .share-btn:hover {
   background: var(--accent-soft);
   color: var(--accent);
 }
-/* ---------- Mobile quick fix: sticky footer ---------- */
-@media (max-width: 768px) {
-  .footer {
-    position: sticky;
-    bottom: 0;
-    z-index: 50;
 
-    background: var(--card-bg);
-    border-top: 1px solid var(--border);
-
-    padding: 8px 10px;
-    margin-top: 12px;
-  }
-
-  /* prevent content from hiding behind footer */
-  .app {
-    padding-bottom: 70px;
-  }
+.version-badge {
+  padding: 2px 8px;
+  border-radius: 999px;
+  background: var(--accent-soft);
+  color: var(--accent);
+  font-size: 0.7rem;
 }
+
+/* ============== MOBILE ONLY ============== */
 @media (max-width: 768px) {
   .footer {
     position: sticky;
@@ -607,7 +603,7 @@ div.popup-dot { display:none !important; }
     z-index: 50;
     background: var(--card-bg);
     border-top: 1px solid var(--border);
-    padding: 8px 10px;
+    padding: 10px;
   }
 
   .footer-actions {
@@ -615,53 +611,13 @@ div.popup-dot { display:none !important; }
     align-items: stretch;
   }
 
-  .footer-actions .share-btn {
+  .share-btn,
+  .version-badge {
     width: 100%;
-    justify-content: center;
-  }
-
-  .footer-actions .version-badge {
-    width: 100%;
-    text-align: center;
   }
 
   .app {
-    padding-bottom: 80px;
-  }
-}
-
-.footer-actions {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  flex-wrap: wrap;
-}
-
-@media (max-width: 768px) {
-  .footer {
-    position: sticky;
-    bottom: 0;
-    z-index: 50;
-    background: var(--card-bg);
-    border-top: 1px solid var(--border);
-    padding: 8px 10px;
-  }
-
-  .footer-actions {
-    display: flex;
-    flex-direction: column;
-    gap: 8px;
-  }
-
-  .footer-actions .share-btn,
-  .footer-actions .version-badge {
-    width: 100%;
-    text-align: center;
-    justify-content: center;
-  }
-
-  .app {
-    padding-bottom: 90px; /* prevents footer overlap */
+    padding-bottom: 90px;
   }
 }
 
@@ -868,7 +824,7 @@ div.popup-dot { display:none !important; }
   <div class="footer-actions">
     <span class="version-badge">Attrack v1.0 — FYBFM Edition (Dec 2025)</span>
 
-    <button id="exportAttendanceBtn" class="share-btn">
+    <button id="exportAttendanceBtn" class="share-btn export-btn">
   📊 Export attendance
 </button>
 
