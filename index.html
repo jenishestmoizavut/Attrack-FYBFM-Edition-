@@ -637,16 +637,34 @@ div.popup-dot { display:none !important; }
   flex-wrap: wrap;
 }
 
-  .footer .share-btn {
+@media (max-width: 768px) {
+  .footer {
+    position: sticky;
+    bottom: 0;
+    z-index: 50;
+    background: var(--card-bg);
+    border-top: 1px solid var(--border);
+    padding: 8px 10px;
+  }
+
+  .footer-actions {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+
+  .footer-actions .share-btn,
+  .footer-actions .version-badge {
     width: 100%;
+    text-align: center;
     justify-content: center;
   }
 
-  .version-badge {
-    width: 100%;
-    text-align: center;
+  .app {
+    padding-bottom: 90px; /* prevents footer overlap */
   }
 }
+
 
   </style>
 </head>
