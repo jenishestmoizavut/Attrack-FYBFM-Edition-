@@ -623,6 +623,37 @@ div.popup-dot { display:none !important; }
     padding-bottom: 110px; /* MUST be bigger than footer */
   }
 }
+@media (max-width: 768px) {
+  .mobile-bar {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 6px;
+
+    padding: 8px;
+    background: var(--card-bg);
+    border-top: 1px solid var(--border);
+    z-index: 200; /* ABOVE footer */
+  }
+
+  .mobile-bar button {
+    border-radius: 10px;
+    border: none;
+    padding: 8px 6px;
+    font-size: 0.75rem;
+    background: var(--accent-soft);
+    color: var(--accent);
+  }
+}
+@media (max-width: 768px) {
+  .footer {
+    display: none;
+  }
+}
 
   </style>
 </head>
