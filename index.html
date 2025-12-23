@@ -787,11 +787,10 @@ div.popup-dot { display:none !important; }
 }
 	  @media (max-width: 600px) {
   /* This targets the Day View container */
-  #dayView {
-    display: flex;
-    flex-direction: column;
+#dayView.active { 
+    display: flex !important;
+    flex-direction: column !important;
   }
-
   /* Force the Lectures list to the top */
   .lectures-section-container { 
     order: 1; 
