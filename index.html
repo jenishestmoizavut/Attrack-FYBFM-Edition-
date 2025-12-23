@@ -785,6 +785,32 @@ div.popup-dot { display:none !important; }
     font-size: 0.8rem;
   }
 }
+	  @media (max-width: 600px) {
+  /* This targets the Day View container */
+  #dayView {
+    display: flex;
+    flex-direction: column;
+  }
+
+  /* Force the Lectures list to the top */
+  .lectures-section-container { 
+    order: 1; 
+  }
+
+  /* Push the "Manage Subjects" list to the bottom */
+  .subjects-management-container { 
+    order: 2; 
+    margin-top: 40px; 
+    border-top: 2px dashed var(--border);
+    padding-top: 20px;
+  }
+  
+  /* Make the title of the subjects list smaller so it doesn't distract */
+  .subjects-management-container h3 {
+    font-size: 0.9rem;
+    color: var(--muted);
+  }
+}
   </style>
 </head>
 <body>
@@ -1776,6 +1802,9 @@ div.popup-dot { display:none !important; }
       renderSubjectStats();
       renderTimetable();
       renderSummary();
+		if (state.isInitialized) {
+          switchView("dayView");
+      }
     })();
 
   })();
