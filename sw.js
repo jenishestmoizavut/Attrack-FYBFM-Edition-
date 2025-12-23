@@ -1,4 +1,4 @@
-const CACHE_NAME = "attrack-cache-v2"; // ⬅️ bump this on every release
+const CACHE_NAME = "attrack-cache-v3"; // ⬅️ bump this on every release
 
 /* ---------- 1️⃣ INSTALL ---------- */
 self.addEventListener("install", event => {
@@ -43,5 +43,6 @@ self.addEventListener("fetch", event => {
 
 const CACHE_VERSION = "attrack-v1.0.1"; // 👈 bump when you update
 const CACHE_NAME = `${CACHE_VERSION}-cache`;
+
 
 
