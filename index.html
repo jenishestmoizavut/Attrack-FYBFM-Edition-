@@ -620,7 +620,74 @@ div.popup-dot { display:none !important; }
     padding-bottom: 90px;
   }
 }
+@media (max-width: 768px) {
+  body {
+    padding: 8px;
+  }
 
+  .app {
+    max-width: 100%;
+    border-radius: 10px;
+    padding: 10px 12px 80px;
+    box-shadow: none;
+    border: none;
+  }
+}
+@media (max-width: 768px) {
+  .title {
+    flex-wrap: wrap;
+    font-size: 1rem;
+  }
+
+  .badge {
+    margin-left: 0;
+    margin-top: 4px;
+  }
+
+  .cheer {
+    font-size: 0.82rem;
+  }
+
+  .summary {
+    font-size: 0.85rem;
+  }
+}
+@media (max-width: 768px) {
+  .nav {
+    display: none;
+  }
+}
+
+@media (max-width: 768px) {
+  .mobile-bar {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 6px;
+    padding: 8px;
+    background: var(--card-bg);
+    border-top: 1px solid var(--border);
+    z-index: 100;
+  }
+
+  .mobile-bar button {
+    border-radius: 10px;
+    border: none;
+    padding: 8px 6px;
+    font-size: 0.75rem;
+    background: var(--accent-soft);
+    color: var(--accent);
+  }
+}
+@media (max-width: 768px) {
+  #homeView .subject-stats-list {
+    max-height: 140px;
+    overflow-y: auto;
+  }
+}
 
   </style>
 </head>
@@ -938,6 +1005,7 @@ if (exportBtn) {
 		{ date: "2025-11-29", subjectId: "sub-ppbi" }, // ❌ PPBI never happened
 	{ date: "2025-11-29", subjectId: "sub-ui" }, // ❌ UI cancelled
       { date: "2025-12-05", subjectId: "sub-cs"   },
+		 { date: "2025-12-23", subjectId: "sub-cs"   },
     ];
 
     // ---------- small helpers ----------
@@ -1957,5 +2025,12 @@ if (shareBtn) {
   }
 })();
 </script>
+	<div class="mobile-bar">
+  <button onclick="switchView('dayView')">📅 Today</button>
+  <button onclick="autoLoadTodayLectures()">⚡ Load</button>
+  <button onclick="markAllAbsentBtn.click()">❌ Absent</button>
+  <button onclick="markAllAttendedBtn.click()">✅ Present</button>
+</div>
+
 </body>
 </html>
