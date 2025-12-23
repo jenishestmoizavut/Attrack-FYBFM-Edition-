@@ -742,6 +742,49 @@ div.popup-dot { display:none !important; }
 @media (min-width: 601px) {
   .mobile-only-hero { display: none; }
 }
+	  @media (max-width: 600px) {
+  /* 1. Add space between the main sections */
+  .card, .stats-grid, .view, .view-header {
+    margin-bottom: 24px !important; 
+    gap: 15px !important;
+  }
+
+  /* 2. Make the Subject Stats look like clean cards, not a tight list */
+  .subject-stat-row {
+    background: var(--bg-soft);
+    padding: 15px;
+    border-radius: 12px;
+    margin-bottom: 10px;
+    border: 1px solid var(--border);
+  }
+
+  /* 3. Fix the "Squashed" Table problem */
+  /* This turns each row into its own little 'chunk' instead of a tight line */
+  #lecturesTableBody tr {
+    display: block;
+    background: var(--card-bg);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    margin-bottom: 15px;
+    padding: 10px;
+  }
+
+  #lecturesTableBody td {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border: none;
+    padding: 8px 5px;
+  }
+
+  /* Add labels so you know what each row in the 'chunk' is */
+  #lecturesTableBody td::before {
+    content: attr(data-label); /* We will add this in the HTML next */
+    font-weight: bold;
+    color: var(--muted);
+    font-size: 0.8rem;
+  }
+}
   </style>
 </head>
 <body>
@@ -966,7 +1009,7 @@ div.popup-dot { display:none !important; }
   </div>
 
   <div class="footer-credit">
-    Made with 💻 by Jenish &amp; ChatGPT
+   Made with 💻 by Jenish, ChatGPT &amp; Gemini
   </div>
 </div>
 
@@ -1442,14 +1485,14 @@ div.popup-dot { display:none !important; }
         select.value = lec.subjectId || "";
         select.addEventListener("change", () => { lec.subjectId = select.value; saveState(); renderSubjectStats(); });
         tdSub.appendChild(select); tr.appendChild(tdSub);
-
+		tdSub.setAttribute("data-label", "Subject"); // Add this line
         // Title
         const tdTitle = document.createElement("td");
         const tInput = document.createElement("input");
         tInput.type = "text"; tInput.placeholder = "e.g. Tutorial..."; tInput.value = lec.title || "";
         tInput.addEventListener("input", () => { lec.title = tInput.value; saveState(); });
         tdTitle.appendChild(tInput); tr.appendChild(tdTitle);
-
+		tdTitle.setAttribute("data-label", "Topic"); // Add this line
         // Special
         const tdSpec = document.createElement("td"); tdSpec.className = "center";
         if (lec.isSpecial) {
@@ -1459,13 +1502,13 @@ div.popup-dot { display:none !important; }
         specBtn.textContent = lec.isSpecial ? "Make normal" : "Make special";
         specBtn.addEventListener("click", () => { lec.isSpecial = !lec.isSpecial; saveState(); renderLectures(); });
         tdSpec.appendChild(specBtn); tr.appendChild(tdSpec);
-
+		tdSpec.setAttribute("data-label", "Type"); // Label it "Type" or "Special"
         // Attendance
         const tdAtt = document.createElement("td"); tdAtt.className = "center";
         const cb = document.createElement("input"); cb.type="checkbox"; cb.checked = !!lec.attended;
         cb.addEventListener("change", () => { lec.attended = cb.checked; saveState(); renderSummary(); renderSubjectStats(); });
         tdAtt.appendChild(cb); tr.appendChild(tdAtt);
-
+		tdAtt.setAttribute("data-label", "Attended?");
         // Remove
         const tdDel = document.createElement("td"); tdDel.className="center";
         const delBtn = document.createElement("button"); delBtn.className="btn small danger"; delBtn.textContent="✕";
@@ -1475,7 +1518,7 @@ div.popup-dot { display:none !important; }
           saveState(); renderLectures(); renderCalendar(); renderSubjectStats(); renderSummary();
         });
         tdDel.appendChild(delBtn); tr.appendChild(tdDel);
-
+		
         lecturesTableBodyEl.appendChild(tr);
       });
       renderSummary();
