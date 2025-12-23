@@ -598,94 +598,29 @@ div.popup-dot { display:none !important; }
 /* ============== MOBILE ONLY ============== */
 @media (max-width: 768px) {
   .footer {
-    position: sticky;
-    bottom: 0;
-    z-index: 50;
-    background: var(--card-bg);
-    border-top: 1px solid var(--border);
-    padding: 10px;
-  }
-
-  .footer-actions {
-    flex-direction: column;
-    align-items: stretch;
-  }
-
-  .share-btn,
-  .version-badge {
-    width: 100%;
-  }
-
-  .app {
-    padding-bottom: 90px;
-  }
-}
-@media (max-width: 768px) {
-  body {
-    padding: 8px;
-  }
-
-  .app {
-    max-width: 100%;
-    border-radius: 10px;
-    padding: 10px 12px 80px;
-    box-shadow: none;
-    border: none;
-  }
-}
-@media (max-width: 768px) {
-  .title {
-    flex-wrap: wrap;
-    font-size: 1rem;
-  }
-
-  .badge {
-    margin-left: 0;
-    margin-top: 4px;
-  }
-
-  .cheer {
-    font-size: 0.82rem;
-  }
-
-  .summary {
-    font-size: 0.85rem;
-  }
-}
-@media (max-width: 768px) {
-  .nav {
-    display: none;
-  }
-}
-
-@media (max-width: 768px) {
-  .mobile-bar {
     position: fixed;
     bottom: 0;
     left: 0;
     right: 0;
-    display: grid;
-    grid-template-columns: repeat(4, 1fr);
-    gap: 6px;
-    padding: 8px;
+    z-index: 100;
+
     background: var(--card-bg);
     border-top: 1px solid var(--border);
-    z-index: 100;
+    padding: 8px 10px;
   }
 
-  .mobile-bar button {
-    border-radius: 10px;
-    border: none;
-    padding: 8px 6px;
-    font-size: 0.75rem;
-    background: var(--accent-soft);
-    color: var(--accent);
+  .footer-actions {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
   }
-}
-@media (max-width: 768px) {
-  #homeView .subject-stats-list {
-    max-height: 140px;
-    overflow-y: auto;
+
+  .footer-actions > * {
+    width: 100%;
+  }
+
+  .app {
+    padding-bottom: 110px; /* MUST be bigger than footer */
   }
 }
 
