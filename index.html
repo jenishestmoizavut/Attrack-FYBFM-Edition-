@@ -811,6 +811,81 @@ div.popup-dot { display:none !important; }
     color: var(--muted);
   }
 }
+@media (max-width: 600px) {
+  /* This turns the Day View into a stackable 'Flex' container */
+  #dayView {
+    display: flex !important;
+    flex-direction: column !important;
+  }
+
+  /* Force the Lectures container to be #1 in the stack */
+  .mobile-top-order {
+    order: 1 !important;
+  }
+
+  /* Force the Subjects/Calendar container to be #2 in the stack */
+  .mobile-bottom-order {
+    order: 2 !important;
+    margin-top: 40px; /* Adds space so it doesn't look clumped */
+    border-top: 2px dashed var(--border); /* Visual separator */
+    padding-top: 20px;
+  }
+}
+/* --- THE ULTIMATE MOBILE FIX (Put this at the very bottom of styles) --- */
+@media (max-width: 600px) {
+  /* 1. Fix the 'Wide' problem: Force everything to stay inside the screen */
+  * { 
+    box-sizing: border-box !important; 
+  }
+  
+  html, body, .app {
+    overflow-x: hidden !important;
+    width: 100% !important;
+    margin: 0 !important;
+    padding: 10px !important;
+  }
+
+  /* 2. Fix the 'Clumping': Add space between cards */
+  .card {
+    margin-bottom: 24px !important; 
+    padding: 15px !important;
+  }
+
+  /* 3. The 'Swap': Put Lectures at the top */
+  #dayView {
+    display: flex !important;
+    flex-direction: column !important;
+  }
+  .mobile-top-order { 
+    order: 1 !important; 
+  }
+  .mobile-bottom-order { 
+    order: 2 !important; 
+    margin-top: 20px;
+    border-top: 2px dashed var(--border);
+    padding-top: 20px;
+  }
+
+  /* 4. The 'Card' Table: No more squashed rows */
+  #lecturesTableBody tr {
+    display: block !important;
+    background: var(--bg-soft);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    margin-bottom: 15px;
+    padding: 12px;
+  }
+  
+  #lecturesTableBody td {
+    display: flex !important;
+    justify-content: space-between;
+    align-items: center;
+    border: none !important;
+    padding: 8px 0 !important;
+  }
+
+  thead { display: none !important; } /* Hide the headers that cause wideness */
+}
   </style>
 </head>
 <body>
@@ -923,27 +998,25 @@ div.popup-dot { display:none !important; }
   </button>
 </div>
     <div id="dayView" class="view">
-      <div class="grid">
-        <div>
-          <div class="card" style="margin-bottom:8px;">
-            <h3>Subjects 🧠</h3>
-            <div class="subjects-list" id="subjectsList"></div>
-            <button class="btn small secondary" id="addSubjectBtn" type="button" style="margin-top:8px;">+ Add subject</button>
-            <div class="hint" style="margin-top:8px;">
-              These start with your timetable, but you can rename them or add new ones.
-            </div>
-          </div>
 
-          <div class="card">
-            <h3>Calendar 🗓️</h3>
-            <div class="calendar">
-              <div class="cal-header">
-                <button class="btn small secondary" id="prevMonthBtn" type="button">◀</button>
-                <div id="monthLabel"></div>
-                <button class="btn small secondary" id="nextMonthBtn" type="button">▶</button>
-              </div>
-              <div class="cal-grid" id="calGrid"></div>
-            </div>
+  <div class="mobile-bottom-order"> 
+
+      <div class="card">
+        <h3>Manage Subjects</h3>
+        <div id="subjectsList"></div>
+        <button id="addSubjectBtn" class="btn secondary" style="width:100%; margin-top:10px;">+ Add Subject</button>
+      </div>
+
+      <div class="card">
+        <div class="cal-header">
+          <button id="prevMonthBtn" class="btn small">←</button>
+          <h3 id="monthLabel">Month Year</h3>
+          <button id="nextMonthBtn" class="btn small">→</button>
+        </div>
+        <div class="cal-grid" id="calGrid"></div>
+      </div>
+
+  </div>
             <div class="hint" style="margin-top:8px;">
               Tap on a date to see or edit the lectures for that day. Green dots = days with lectures.  
               For future days, use “Load lectures (this day)” below.
@@ -951,48 +1024,45 @@ div.popup-dot { display:none !important; }
           </div>
         </div>
 
-        <div class="card">
-          <h3>Lectures & attendance ✅</h3>
+       <div class="mobile-top-order">
 
-          <div class="filter-row">
-            <span id="selectedDateLabel"></span>
-            <span style="flex:1;"></span>
-            <span>Filter subject:</span>
-            <select id="subjectFilter">
-              <option value="">All</option>
-            </select>
-          </div>
+  <div class="card">
+    <h3>Lectures & attendance ✅</h3>
 
-          <div class="toolbar">
-            <button class="btn small secondary" id="loadDayBtn" type="button">Load lectures (this day)</button>
-            <button class="btn small" id="addLectureBtn" type="button">+ Add lecture</button>
-            <button class="btn small secondary" id="addSpecialLectureBtn" type="button">+ Add special lecture</button>
-            <button class="btn small" id="markAllAttendedBtn" type="button">All attended</button>
-            <button class="btn small secondary" id="markAllAbsentBtn" type="button">All absent</button>
-          </div>
-
-          <table>
-            <thead>
-              <tr>
-                <th style="width: 98px;">Date</th>
-                <th style="width: 120px;">Subject</th>
-                <th>Lecture title / note</th>
-                <th style="width: 70px;">Special</th>
-                <th style="width: 80px;">Attended?</th>
-                <th style="width: 60px;">Remove</th>
-              </tr>
-            </thead>
-            <tbody id="lecturesTableBody"></tbody>
-          </table>
-          <div id="lecturesEmpty" class="lectures-empty"></div>
-          <div class="hint" style="margin-top:8px;">
-            All new lectures are marked as attended by default.  
-            “All attended” / “All absent” flips the whole day in one click.
-          </div>
-        </div>
-      </div>
+    <div class="filter-row">
+      <span id="selectedDateLabel"></span>
+      <span style="flex:1;"></span>
+      <span>Filter subject:</span>
+      <select id="subjectFilter">
+        <option value="">All</option>
+      </select>
     </div>
 
+    <div class="toolbar">
+      <button class="btn small secondary" id="loadDayBtn" type="button">Load lectures (this day)</button>
+      <button class="btn small" id="addLectureBtn" type="button">+ Add lecture</button>
+      <button class="btn small secondary" id="addSpecialLectureBtn" type="button">+ Add special lecture</button>
+      <button class="btn small" id="markAllAttendedBtn" type="button">All attended</button>
+      <button class="btn small secondary" id="markAllAbsentBtn" type="button">All absent</button>
+    </div>
+
+    <table>
+      <thead>
+        <tr>
+          <th style="width: 98px;">Date</th>
+          <th style="width: 120px;">Subject</th>
+          <th>Lecture title / note</th>
+          <th style="width: 70px;">Special</th>
+          <th style="width: 80px;">Attended?</th>
+          <th style="width: 60px;">Remove</th>
+        </tr>
+      </thead>
+      <tbody id="lecturesTableBody"></tbody>
+    </table>
+    <div id="lecturesEmpty" class="lectures-empty"></div>
+  </div>
+
+</div>
     <!-- TIMETABLE VIEW -->
     <div id="timetableView" class="view">
       <div class="card">
