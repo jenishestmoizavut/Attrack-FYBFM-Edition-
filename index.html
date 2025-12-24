@@ -1567,7 +1567,27 @@ const HOLIDAYS = new Set([
       const attended = all.filter(lec => lec.attended).length;
       const total = all.length;
       const pct = total > 0 ? (attended / total) * 100 : 0;
-      
+      // Calculate overall skippable for the header
+const overallTotal = state.lectures.length;
+const overallAttended = state.lectures.filter(l => l.attended).length;
+const overallPercent = overallTotal === 0 ? 0 : Math.round((overallAttended / overallTotal) * 100);
+
+// Simple bunk logic for header
+const overallCanBunk = Math.floor((overallAttended - 0.75 * overallTotal) / 0.75);
+
+// Add this to the summary HTML
+summaryDiv.innerHTML = `
+  <div class="summary-card">
+    <div style="font-size: 0.8rem; opacity: 0.8;">Overall Status</div>
+    <div style="font-size: 1.5rem; font-weight: 800;">${overallPercent}%</div>
+    <div style="font-size: 0.75rem;">
+      ${overallCanBunk >= 0 ? 
+        `✅ You can skip <strong>${overallCanBunk}</strong> more lecs` : 
+        `❌ Attend next few lectures to hit 75%`}
+    </div>
+  </div>
+`;
+
       summaryMainEl.textContent = `${attended} / ${total} lectures attended`;
       summarySubEl.textContent = total ? `Since ${formatDisplayDate(start)}, your attendance is ${formatPct(pct)} 🎯` : "No lectures recorded yet.";
       overallPillText.textContent = formatPct(pct);
