@@ -1085,7 +1085,13 @@ div.popup-dot { display:none !important; }
     })();
 
     // 🎯 Rules & Holidays
-    const HOLIDAYS = new Set(["2025-11-05", "2025-12-06"]);
+    // Updated with Winter Break (Dec 25 - Dec 31)
+const HOLIDAYS = new Set([
+  "2025-11-05", "2025-12-06", 
+  "2025-12-25", "2025-12-26", "2025-12-27", 
+  "2025-12-28", "2025-12-29", "2025-12-30", "2025-12-31"
+]);
+
     const ZERO_LECTURE_DAYS = new Set(["2025-12-10"]);
     const EXTRA_LECTURES = [
       { date: "2025-11-21", subjectId: "sub-fa", title: "Extra lecture" },
