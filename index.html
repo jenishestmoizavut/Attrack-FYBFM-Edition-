@@ -376,6 +376,22 @@ input[type="text"]:focus, input[type="date"]:focus, select:focus{
   color:#fff;
   transition: background 0.15s ease, transform 0.05s ease, opacity 0.1s ease;
 }
+	  .mobile-only-hero .btn {
+  font-family: inherit; /* Fixes out-of-place font */
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  background: linear-gradient(135deg, #4f46e5 0%, #7c3aed 100%); /* Purple-Blue gradient */
+  border: none;
+  box-shadow: 0 10px 15px -3px rgba(79, 70, 229, 0.4);
+  transition: all 0.3s ease;
+}
+
+.mobile-only-hero .btn:active {
+  transform: scale(0.95);
+  box-shadow: 0 4px 6px -1px rgba(79, 70, 229, 0.4);
+}
+
 .btn.secondary{ background:#e5e7eb; color:#111827; }
 body.dark .btn.secondary{ background:#111827; color:#e5e7eb; }
 .btn.danger{ background:var(--danger); }
