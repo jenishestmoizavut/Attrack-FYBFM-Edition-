@@ -1563,50 +1563,59 @@ const HOLIDAYS = new Set([
 
     function formatPct(pct) { return pct.toFixed(2).replace(/\.00$/, "") + "%"; }
 
-    function renderSummary() {
+        function renderSummary() {
+      // 1. Calculate Basic Stats
       const start = state.startDate || toISODate(new Date());
       const all = state.lectures.filter(lec => lec.date && lec.date >= start);
       const attended = all.filter(lec => lec.attended).length;
       const total = all.length;
-      const pct = total > 0 ? (attended / total) * 100 : 0;
-      // Calculate overall skippable for the header
-const overallTotal = state.lectures.length;
-const overallAttended = state.lectures.filter(l => l.attended).length;
-const overallPercent = overallTotal === 0 ? 0 : Math.round((overallAttended / overallTotal) * 100);
+      const pct = total > 0 ? Math.round((attended / total) * 100) : 0;
 
-// Simple bunk logic for header
-const overallCanBunk = Math.floor((overallAttended - 0.75 * overallTotal) / 0.75);
+      // 2. Update the Header (Top Right Corner)
+      if (summaryMainEl) summaryMainEl.textContent = `${attended} / ${total} lectures tracked`;
+      if (summarySubEl) summarySubEl.textContent = `Overall: ${pct}%`;
+      if (overallPillText) overallPillText.textContent = `${pct}%`;
 
-// Add this to the summary HTML
-summaryDiv.innerHTML = `
-  <div class="summary-card">
-    <div style="font-size: 0.8rem; opacity: 0.8;">Overall Status</div>
-    <div style="font-size: 1.5rem; font-weight: 800;">${overallPercent}%</div>
-    <div style="font-size: 0.75rem;">
-      ${overallCanBunk >= 0 ? 
-        `✅ You can skip <strong>${overallCanBunk}</strong> more lecs` : 
-        `❌ Attend next few lectures to hit 75%`}
-    </div>
-  </div>
-`;
+      // 3. Calculate "Bunkable" vs "Lagging"
+      // If we are ABOVE 75%, how many can we miss? 
+      // Formula: (Attended - 0.75 * Total) / 0.75
+      const canBunk = Math.floor((attended - 0.75 * total) / 0.75);
+      
+      // If we are BELOW 75%, how many do we need to attend?
+      // Formula: (0.75 * Total - Attended) / 0.25
+      const needToAttend = Math.ceil((0.75 * total - attended) / 0.25);
 
-      summaryMainEl.textContent = `${attended} / ${total} lectures attended`;
-      summarySubEl.textContent = total ? `Since ${formatDisplayDate(start)}, your attendance is ${formatPct(pct)} 🎯` : "No lectures recorded yet.";
-      overallPillText.textContent = formatPct(pct);
-
-      if (targetMessageEl) {
-        const t = TARGET_ATTENDANCE;
-        const frac = total > 0 ? attended/total : 0;
-        if (!total) targetMessageEl.textContent = "Start adding lectures to see your forecast.";
-        else if (frac < t) {
-          const needed = Math.max(0, Math.ceil((t * total - attended) / (1 - t)));
-          targetMessageEl.textContent = `Attend the next ${needed} lecture(s) in a row to reach 75%.`;
+      // 4. Update the Home View Card (finalAttendanceSummary)
+      const summaryDiv = document.getElementById('finalAttendanceSummary');
+      
+      if (summaryDiv) {
+        let statusHtml = '';
+        
+        if (pct >= 75) {
+          statusHtml = `
+            <div style="background:#dcfce7; color:#166534; padding:12px; border-radius:8px; margin-top:10px; border:1px solid #bbf7d0;">
+              <strong>You are safe! 🎉</strong><br>
+              You can skip the next <strong>${canBunk}</strong> lectures and stay above 75%.
+            </div>`;
         } else {
-          const buffer = Math.floor((attended - t * total) / t);
-          targetMessageEl.textContent = `You can miss about ${buffer} lecture(s) and stay above 75%.`;
+          statusHtml = `
+            <div style="background:#fee2e2; color:#991b1b; padding:12px; border-radius:8px; margin-top:10px; border:1px solid #fecaca;">
+              <strong>Attendance Low ⚠️</strong><br>
+              You need to attend <strong>${needToAttend}</strong> more lectures in a row to hit 75%.
+            </div>`;
         }
+
+        summaryDiv.innerHTML = `
+          <div style="display:flex; align-items:center; justify-content:space-between; margin-top:10px;">
+            <div class="pill" style="font-size:1rem; padding:6px 14px;">
+              🎯 Overall: <strong>${pct}%</strong>
+            </div>
+          </div>
+          ${statusHtml}
+        `;
       }
     }
+
 
     function renderSubjectStats() {
       const start = state.startDate || toISODate(new Date());
