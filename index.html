@@ -785,6 +785,17 @@ div.popup-dot { display:none !important; }
     font-size: 0.8rem;
   }
 }
+@media (max-width: 600px) {
+  .sidebar {
+    background: rgba(var(--card-bg-rgb), 0.8);
+    backdrop-filter: blur(10px);
+    padding-bottom: env(safe-area-inset-bottom); /* Fix for iPhones with notches */
+  }
+  .nav-btn {
+    flex-direction: column; /* Icon above text */
+    gap: 2px;
+  }
+}
   </style>
 </head>
 <body>
