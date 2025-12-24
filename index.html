@@ -835,19 +835,21 @@ div.popup-dot { display:none !important; }
       </div>
     </div>
 
-    <div class="nav" role="navigation" aria-label="Main navigation">
-      <button class="nav-btn" data-view="homeView" type="button">🏠 Home</button>
-<button class="nav-btn active" data-view="dayView" type="button">📅 Daily view</button>
+<div class="nav" role="navigation" aria-label="Main navigation">
+  <button class="nav-btn active" data-view="dayView" type="button">📅 Daily view</button>
+  
+  <button class="nav-btn" data-view="homeView" type="button">🏠 Home</button>
+  
+  <button class="nav-btn" data-view="timetableView" type="button">🗓 Timetable</button>
+  
+  <button id="showTutorialNavBtn" class="nav-btn" type="button">🎓 Show tutorial</button>
+  <div class="nav-spacer"></div>
+  <button id="darkToggle" class="dark-toggle" type="button">
+    <span id="darkIcon">🌙</span>
+    <span id="darkLabel">Dark mode</span>
+  </button>
+</div>
 
-      <button class="nav-btn" data-view="homeView" type="button">🏠 Daily view</button>
-      <button class="nav-btn" data-view="timetableView" type="button">🗓 Timetable</button>
-      <button id="showTutorialNavBtn" class="nav-btn" type="button">🎓 Show tutorial</button>
-      <div class="nav-spacer"></div>
-      <button id="darkToggle" class="dark-toggle" type="button">
-        <span id="darkIcon">🌙</span>
-        <span id="darkLabel">Dark mode</span>
-      </button>
-    </div>
     <!-- ----------------- end Header + Nav ----------------- -->
 
     <!-- Tutorial modal (hidden by default) -->
