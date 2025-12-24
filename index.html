@@ -1569,7 +1569,8 @@ const HOLIDAYS = new Set([
       const all = state.lectures.filter(lec => lec.date && lec.date >= start);
       const attended = all.filter(lec => lec.attended).length;
       const total = all.length;
-      const pct = total > 0 ? Math.round((attended / total) * 100) : 0;
+      const pct = total > 0 ? ((attended / total) * 100).toFixed(2) : "0.00";
+
 
       // 2. Update the Header (Top Right Corner)
       if (summaryMainEl) summaryMainEl.textContent = `${attended} / ${total} lectures tracked`;
