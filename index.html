@@ -1592,7 +1592,8 @@ const HOLIDAYS = new Set([
       if (summaryDiv) {
         let statusHtml = '';
         
-        if (pct >= 75) {
+        if (parseFloat(pct) >= 75) {
+
           statusHtml = `
             <div style="background:#dcfce7; color:#166534; padding:12px; border-radius:8px; margin-top:10px; border:1px solid #bbf7d0;">
               <strong>You are safe! 🎉</strong><br>
@@ -1606,14 +1607,26 @@ const HOLIDAYS = new Set([
             </div>`;
         }
 
-        summaryDiv.innerHTML = `
-          <div style="display:flex; align-items:center; justify-content:space-between; margin-top:10px;">
-            <div class="pill" style="font-size:1rem; padding:6px 14px;">
-              🎯 Overall: <strong>${pct}%</strong>
-            </div>
-          </div>
-          ${statusHtml}
-        `;
+        const displayPct = parseFloat(pct); // Ensures we are checking the actual number
+
+summaryDiv.innerHTML = `
+  <div style="display:flex; align-items:center; justify-content:space-between; margin-top:5px;">
+    <div class="pill" style="font-size:0.9rem; font-weight:700;">🎯 Overall: ${pct}%</div>
+  </div>
+  
+  ${displayPct >= 75 ? `
+    <div style="background:rgba(22, 163, 74, 0.1); color:#16a34a; padding:12px; border-radius:12px; margin-top:10px; border:1px solid rgba(22, 163, 74, 0.2); font-size:0.85rem;">
+      <strong>Safe Zone! 🎉</strong><br>
+      You are above the 75% limit.
+    </div>
+  ` : `
+    <div style="background:rgba(220, 38, 38, 0.1); color:#dc2626; padding:12px; border-radius:12px; margin-top:10px; border:1px solid rgba(220, 38, 38, 0.2); font-size:0.85rem;">
+      <strong>Below 75% ⚠️</strong><br>
+      You are currently at ${pct}%. Every lecture counts!
+    </div>
+  `}
+`;
+
       }
     }
 
