@@ -34,6 +34,13 @@ self.addEventListener("activate", event => {
 
 /* ---------- 3️⃣ FETCH ---------- */
 self.addEventListener("fetch", event => {
+  if (event.request.mode === "navigate") {
+    event.respondWith(
+      caches.match("./index.html")
+    );
+    return;
+  }
+
   event.respondWith(
     caches.match(event.request).then(res => res || fetch(event.request))
   );
