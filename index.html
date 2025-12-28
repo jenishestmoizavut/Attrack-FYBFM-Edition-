@@ -1868,11 +1868,48 @@ const HOLIDAYS = new Set([
   style="display:none"
 />
 <script>
+  /* ---------- SERVICE WORKER & NOTIFICATIONS ---------- */
   if ("serviceWorker" in navigator) {
-    navigator.serviceWorker.register("./sw.js");
+    window.addEventListener('load', async () => {
+      try {
+        const registration = await navigator.serviceWorker.register("./sw.js");
+        
+        // 1. Ask for permission automatically on startup
+        if (Notification.permission === "default") {
+          await Notification.requestPermission();
+        }
+
+        // 2. Standardized Daily Reminder Logic (5:00 PM)
+        function checkDailyReminder() {
+          const STANDARD_HOUR = 20; // 8:00 PM
+          const now = new Date();
+          const todayStr = now.toISOString().slice(0, 10);
+          const lastReminderDate = localStorage.getItem("attrack_last_notif_date");
+
+          // Trigger if it's past 8 PM and we haven't reminded them today
+          if (now.getHours() >= STANDARD_HOUR && lastReminderDate !== todayStr) {
+            if (Notification.permission === "granted") {
+              registration.showNotification("Daily Attendance Check! 📚", {
+                body: "It's 8 PM! Have you marked your lectures for today yet?",
+                icon: "./icon-192.png",
+                badge: "./icon-192.png",
+                tag: "daily-reminder" // Prevents multiple notifications stacking
+              });
+              localStorage.setItem("attrack_last_notif_date", todayStr);
+            }
+          }
+        }
+
+        // Check every hour while app is open, plus once on startup
+        setInterval(checkDailyReminder, 60 * 60 * 1000);
+        checkDailyReminder();
+
+      } catch (err) {
+        console.error("SW registration failed", err);
+      }
+    });
   }
-</script>
-<script>
+</script><script>
 (function () {
   try {
     const today = new Date().toISOString().slice(0, 10);
