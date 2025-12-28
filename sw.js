@@ -1,10 +1,9 @@
-const CACHE_VERSION = "v1.0.1";
+const CACHE_VERSION = "v5";
 const CACHE_NAME = `attrack-${CACHE_VERSION}`;
 
 /* ---------- 1️⃣ INSTALL ---------- */
 self.addEventListener("install", event => {
   self.skipWaiting();
-
   event.waitUntil(
     caches.open(CACHE_NAME).then(cache =>
       cache.addAll([
@@ -28,52 +27,41 @@ self.addEventListener("activate", event => {
       )
     )
   );
-
   self.clients.claim();
 });
 
 /* ---------- 3️⃣ FETCH ---------- */
 self.addEventListener("fetch", event => {
   if (event.request.mode === "navigate") {
-    event.respondWith(
-      caches.match("./index.html")
-    );
+    event.respondWith(caches.match("./index.html"));
     return;
   }
-/* ---------- 4️⃣ NOTIFICATIONS ---------- */
 
-// Handle notification click (opens the app)
-self.addEventListener("notificationclick", event => {
-  event.notification.close();
-  event.waitUntil(
-    clients.matchAll({ type: "window" }).then(clientList => {
-      if (clientList.length > 0) return clientList[0].focus();
-      return clients.openWindow("./");
-    })
+  event.respondWith(
+    caches.match(event.request).then(res => res || fetch(event.request))
   );
 });
 
-// Example function to show a notification (can be called via Push API or logic)
+/* ---------- 4️⃣ NOTIFICATION CLICK ---------- */
+self.addEventListener("notificationclick", event => {
+  event.notification.close();
+  event.waitUntil(
+    clients.matchAll({ type: "window", includeUncontrolled: true })
+      .then(clientList => {
+        if (clientList.length > 0) {
+          return clientList[0].focus();
+        }
+        return clients.openWindow("./");
+      })
+  );
+});
+
+/* ---------- 5️⃣ OPTIONAL HELPER ---------- */
 function showReminder(title, body) {
-  self.registration.showNotification(title, {
-    body: body,
+  return self.registration.showNotification(title, {
+    body,
     icon: "./icon-192.png",
     badge: "./icon-192.png",
     vibrate: [100, 50, 100]
   });
 }
-  event.respondWith(
-    caches.match(event.request).then(res => res || fetch(event.request))
-  );
-});
-/* ---------- 4️⃣ NOTIFICATIONS ---------- */
-self.addEventListener("notificationclick", event => {
-  event.notification.close();
-  event.waitUntil(
-    clients.matchAll({ type: "window" }).then(clientList => {
-      if (clientList.length > 0) return clientList[0].focus();
-      return clients.openWindow("./index.html");
-    })
-  );
-});
-
