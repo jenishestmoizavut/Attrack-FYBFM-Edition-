@@ -337,9 +337,15 @@ h1,h2,h3 { margin:0 0 8px; }
   border-radius:12px;
   border:1px solid var(--border);
   background:var(--bg-soft);
-  padding:12px;
+  padding:14px;                 /* ⬅ more breathing room */
 }
-.card h3{ font-size:0.95rem; margin-bottom:6px; }
+
+.card h3{
+  font-size:1rem;               /* ⬅ clear hierarchy */
+  font-weight:600;
+  line-height:1.25;
+  margin-bottom:8px;            /* ⬅ separates content */
+}
 
 /* ---------------- Inputs, buttons ---------------- */
 .field{ margin-bottom:8px; display:flex; flex-direction:column; gap:4px; }
@@ -812,6 +818,55 @@ div.popup-dot { display:none !important; }
     gap: 2px;
   }
 }
+	  /* ---------- Mobile Typography Fix ---------- */
+@media (max-width: 768px) {
+
+  body {
+    font-size: 15.5px;          /* ⬅ was effectively ~14 */
+    line-height: 1.55;          /* ⬅ improves readability */
+  }
+
+  h1, h2, h3 {
+    line-height: 1.25;
+    font-weight: 700;
+  }
+
+  .card h3 {
+    font-size: 1rem;            /* was visually too small */
+    font-weight: 600;
+  }
+
+  .btn {
+    font-size: 0.9rem;          /* slightly calmer */
+    font-weight: 600;           /* less shouty */
+  }
+
+  .summary-main {
+    font-size: 1.05rem;
+    font-weight: 700;
+  }
+
+  .summary-sub {
+    font-size: 0.85rem;
+  }
+
+  .hint,
+  .lectures-empty {
+    font-size: 0.85rem;
+    line-height: 1.5;
+  }
+}
+@media (max-width: 768px){
+  .card{
+    padding:16px;               /* ⬅ mobile comfort */
+  }
+
+  .card h3{
+    font-size:1.05rem;          /* ⬅ section headers feel real */
+  }
+}
+
+	
   </style>
 </head>
 <body>
