@@ -524,11 +524,6 @@ td .center{ text-align:center; }
 .title{ font-size:1.08rem; }
 .cheer{ font-size:0.88rem; max-width:56vw; }
 
-/* Reduce overall padding slightly */
-.app{ padding:12px 16px 18px; }
-.card{ padding:10px; }
-.home-grid{ gap:10px; }
-
 /* Hide any accidental empty modal element or stray popup */
 #tutorialModalBackdrop[style*="display:flex"] > #tutorialModal:empty,
 div.popup-dot { display:none !important; }
@@ -880,7 +875,25 @@ div.popup-dot { display:none !important; }
   }
 }
 
-	
+	/* ---------- FINAL mobile hero fix ---------- */
+@media (max-width: 768px) {
+  .mobile-only-hero {
+    margin-bottom: 24px;
+  }
+
+  .mobile-only-hero .btn {
+    font-size: 1rem;
+    font-weight: 600;
+    letter-spacing: 0;
+    text-transform: none;
+    height: 56px;
+  }
+
+  .mobile-only-hero .btn:hover {
+    transform: none;
+  }
+}
+
   </style>
 </head>
 <body>
@@ -905,11 +918,10 @@ div.popup-dot { display:none !important; }
     </div>
 
 <div class="nav" role="navigation" aria-label="Main navigation">
-	<button class="nav-btn" data-view="homeView" type="button">🏠 Home</button>
+  <button class="nav-btn" data-view="homeView" type="button">🏠 Home</button>
   <button class="nav-btn active" data-view="dayView" type="button">📅 Daily view</button>
-  
   <button class="nav-btn" data-view="timetableView" type="button">🗓 Timetable</button>
-  
+
   <button id="showTutorialNavBtn" class="nav-btn" type="button">🎓 Show tutorial</button>
   <div class="nav-spacer"></div>
   <button id="darkToggle" class="dark-toggle" type="button">
@@ -917,6 +929,7 @@ div.popup-dot { display:none !important; }
     <span id="darkLabel">Dark mode</span>
   </button>
 </div>
+
 
     <!-- ----------------- end Header + Nav ----------------- -->
 
@@ -989,7 +1002,7 @@ div.popup-dot { display:none !important; }
     </div>
 
     <!-- DAILY VIEW -->
-<div class="mobile-only-hero" style="margin-bottom: 20px;">
+<div class="mobile-only-hero">
 <button
   class="btn"
   style="width: 100%; height: 56px;"
