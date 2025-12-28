@@ -66,4 +66,14 @@ function showReminder(title, body) {
     caches.match(event.request).then(res => res || fetch(event.request))
   );
 });
+/* ---------- 4️⃣ NOTIFICATIONS ---------- */
+self.addEventListener("notificationclick", event => {
+  event.notification.close();
+  event.waitUntil(
+    clients.matchAll({ type: "window" }).then(clientList => {
+      if (clientList.length > 0) return clientList[0].focus();
+      return clients.openWindow("./index.html");
+    })
+  );
+});
 
