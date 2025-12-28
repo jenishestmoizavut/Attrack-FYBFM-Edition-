@@ -836,9 +836,8 @@ div.popup-dot { display:none !important; }
     </div>
 
 <div class="nav" role="navigation" aria-label="Main navigation">
+	<button class="nav-btn" data-view="homeView" type="button">🏠 Home</button>
   <button class="nav-btn active" data-view="dayView" type="button">📅 Daily view</button>
-  
-  <button class="nav-btn" data-view="homeView" type="button">🏠 Home</button>
   
   <button class="nav-btn" data-view="timetableView" type="button">🗓 Timetable</button>
   
@@ -1843,6 +1842,10 @@ const HOLIDAYS = new Set([
       renderSubjectStats();
       renderTimetable();
       renderSummary();
+		// This forces the app to open 'Daily View' every time, regardless of button order
+      switchView("dayView"); 
+
+    })();
     })();
 
   })();
