@@ -875,22 +875,31 @@ div.popup-dot { display:none !important; }
   }
 }
 
-	/* ---------- FINAL mobile hero fix ---------- */
+/* ---------- FINAL mobile hero fix ---------- */
 @media (max-width: 768px) {
   .mobile-only-hero {
     margin-bottom: 24px;
   }
 
   .mobile-only-hero .btn {
-    font-size: 1rem;
-    font-weight: 600;
-    letter-spacing: 0;
-    text-transform: none;
-    height: 56px;
+    /* Font Polish */
+    font-size: 1.05rem !important;  /* Force slightly larger text */
+    font-weight: 700 !important;    /* Make it bold */
+    letter-spacing: 0.5px;
+    text-transform: none;           /* Keep it standard case (not all caps) */
+    
+    /* Box Polish */
+    height: 54px;                   /* Taller button for easier tapping */
+    width: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 12px;
+    box-shadow: 0 4px 10px rgba(79, 70, 229, 0.3);
   }
 
-  .mobile-only-hero .btn:hover {
-    transform: none;
+  .mobile-only-hero .btn:active {
+    transform: scale(0.98);
   }
 }
 
@@ -919,9 +928,11 @@ div.popup-dot { display:none !important; }
 
 <div class="nav" role="navigation" aria-label="Main navigation">
   <button class="nav-btn" data-view="homeView" type="button">🏠 Home</button>
-  <button class="nav-btn active" data-view="dayView" type="button">📅 Daily view</button>
+  
+  <button class="nav-btn" data-view="dayView" type="button">📅 Daily view</button>
+  
   <button class="nav-btn" data-view="timetableView" type="button">🗓 Timetable</button>
-
+  
   <button id="showTutorialNavBtn" class="nav-btn" type="button">🎓 Show tutorial</button>
   <div class="nav-spacer"></div>
   <button id="darkToggle" class="dark-toggle" type="button">
@@ -1678,15 +1689,17 @@ const HOLIDAYS = new Set([
         let statusHtml = '';
         
         if (pct >= 75) {
+          // GREEN CARD (SAFE)
           statusHtml = `
-            <div style="background:#dcfce7; color:#166534; padding:12px; border-radius:8px; margin-top:10px; border:1px solid #bbf7d0;">
-              <strong>You are safe! 🎉</strong><br>
+            <div style="background:#dcfce7; color:#166534; padding:16px; border-radius:12px; margin-top:12px; border:1px solid #bbf7d0; font-size: 0.95rem; line-height: 1.5;">
+              <strong style="font-size:1.05rem;">You are safe! 🎉</strong><br>
               You can skip the next <strong>${canBunk}</strong> lectures and stay above 75%.
             </div>`;
         } else {
+          // RED CARD (DANGER)
           statusHtml = `
-            <div style="background:#fee2e2; color:#991b1b; padding:12px; border-radius:8px; margin-top:10px; border:1px solid #fecaca;">
-              <strong>Attendance Low ⚠️</strong><br>
+            <div style="background:#fee2e2; color:#991b1b; padding:16px; border-radius:12px; margin-top:12px; border:1px solid #fecaca; font-size: 0.95rem; line-height: 1.5;">
+              <strong style="font-size:1.05rem;">Attendance Low ⚠️</strong><br>
               You need to attend <strong>${needToAttend}</strong> more lectures in a row to hit 75%.
             </div>`;
         }
