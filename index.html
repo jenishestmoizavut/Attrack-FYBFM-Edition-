@@ -1986,6 +1986,8 @@ if ("serviceWorker" in navigator) {
             console.log("Permission granted!");
             // Remove the listeners once permission is handled
             document.removeEventListener('click', askPermission);
+			  check8pmNotification();
+
           }
         }
       };
@@ -2011,6 +2013,8 @@ if ("serviceWorker" in navigator) {
   const today = now.toISOString().slice(0, 10);
 
   if (hour < new Date().getHours()) return;
+// TEMPORARY TEST — REMOVE LATER
+if (false) return;
 
   const last = localStorage.getItem("attrack_8pm_done");
   if (last === today) return;
