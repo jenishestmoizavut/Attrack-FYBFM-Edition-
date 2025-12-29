@@ -2005,31 +2005,56 @@ if ("serviceWorker" in navigator) {
     }
   });
 }
-	function check8pmNotification() {
-  if (Notification.permission !== "granted") return;
+function check8pmNotification() {
+  console.log("🔍 Checking notification status...");
 
+  // 1. Check Permissions
+  if (!("Notification" in window)) {
+    console.log("❌ Error: Browser does not support notifications.");
+    return;
+  }
+  if (Notification.permission !== "granted") {
+    console.log("❌ Error: Permission is '" + Notification.permission + "'. It must be 'granted'.");
+    return;
+  }
+
+  // 2. Check Time
   const now = new Date();
   const hour = now.getHours();
+  console.log("🕒 Detected Hour:", hour); // Should be 20 if your system is 8:24 PM
+
+  if (hour < 20) {
+    console.log("⏳ Too early. Logic requires 8 PM (20:00).");
+    return;
+  }
+
+  // 3. Check "Already Done" Lock
   const today = now.toISOString().slice(0, 10);
-
-  if (hour < 20) return;
-
   const last = localStorage.getItem("attrack_8pm_done");
-  if (last === today) return;
+  
+  if (last === today) {
+    console.log("🔒 Blocked: Notification already sent for date:", today);
+    return;
+  }
 
+  // 4. Send Notification
+  console.log("🚀 All checks passed. Sending notification...");
+  
   navigator.serviceWorker.ready.then(reg => {
-    reg.showNotification("Attrack Reminder 📚", {
+    return reg.showNotification("Attrack Reminder 📚", {
       body: "Have you updated today’s attendance?",
       tag: "attrack-8pm",
-      icon: "icon-192.png",
-      badge: "icon-192.png"
+      icon: "./icon-192.png", 
+      badge: "./icon-192.png",
+      vibrate: [200, 100, 200]
     });
+  }).then(() => {
+    console.log("✅ Notification successfully requested.");
+    localStorage.setItem("attrack_8pm_done", today);
+  }).catch(err => {
+    console.error("❌ Service Worker Error:", err);
   });
-
-  localStorage.setItem("attrack_8pm_done", today);
-
-}
-document.addEventListener("visibilitychange", () => {
+}document.addEventListener("visibilitychange", () => {
   if (!document.hidden) {
     check8pmNotification();
   }
