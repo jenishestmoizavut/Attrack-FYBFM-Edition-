@@ -1,4 +1,4 @@
-const CACHE_VERSION = "v1.0.1";
+const CACHE_VERSION = "v1.0.2";
 const CACHE_NAME = `attrack-${CACHE_VERSION}`;
 
 /* ---------- 1️⃣ INSTALL ---------- */
@@ -40,29 +40,4 @@ self.addEventListener("fetch", event => {
     );
     return;
   }
-/* ---------- 4️⃣ NOTIFICATIONS ---------- */
-
-// Handle notification click (opens the app)
-self.addEventListener("notificationclick", event => {
-  event.notification.close();
-  event.waitUntil(
-    clients.matchAll({ type: "window" }).then(clientList => {
-      if (clientList.length > 0) return clientList[0].focus();
-      return clients.openWindow("./");
-    })
-  );
-});
-
-// Example function to show a notification (can be called via Push API or logic)
-function showReminder(title, body) {
-  self.registration.showNotification(title, {
-    body: body,
-    icon: "./icon-192.png",
-    badge: "./icon-192.png",
-    vibrate: [100, 50, 100]
-  });
-}
-  event.respondWith(
-    caches.match(event.request).then(res => res || fetch(event.request))
-  );
 });
