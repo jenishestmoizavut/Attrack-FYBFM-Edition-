@@ -1996,12 +1996,42 @@ if ("serviceWorker" in navigator) {
       }
 
       // ... keep your checkDailyReminder logic here ...
-      
+      check8pmNotification();
+
     } catch (err) {
       console.error("SW registration failed", err);
     }
   });
 }
+	function check8pmNotification() {
+  if (Notification.permission !== "granted") return;
+
+  const now = new Date();
+  const hour = now.getHours();
+  const today = now.toISOString().slice(0, 10);
+
+  if (hour < new Date().getHours()) return;
+
+  const last = localStorage.getItem("attrack_8pm_done");
+  if (last === today) return;
+
+  navigator.serviceWorker.ready.then(reg => {
+    reg.showNotification("Attrack Reminder 📚", {
+      body: "Have you updated today’s attendance?",
+      tag: "attrack-8pm",
+      icon: "icon-192.png",
+      badge: "icon-192.png"
+    });
+  });
+
+  localStorage.setItem("attrack_8pm_done", today);
+}
+document.addEventListener("visibilitychange", () => {
+  if (!document.hidden) {
+    check8pmNotification();
+  }
+});
+
 </script><script>
 (function () {
   try {
