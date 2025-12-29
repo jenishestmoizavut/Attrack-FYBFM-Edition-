@@ -2012,9 +2012,7 @@ if ("serviceWorker" in navigator) {
   const hour = now.getHours();
   const today = now.toISOString().slice(0, 10);
 
-  if (hour < new Date().getHours()) return;
-// TEMPORARY TEST — REMOVE LATER
-if (false) return;
+  if (hour < 20) return;
 
   const last = localStorage.getItem("attrack_8pm_done");
   if (last === today) return;
@@ -2029,6 +2027,7 @@ if (false) return;
   });
 
   localStorage.setItem("attrack_8pm_done", today);
+
 }
 document.addEventListener("visibilitychange", () => {
   if (!document.hidden) {
