@@ -32,15 +32,20 @@ self.addEventListener("activate", event => {
 
 /* ---------- 3️⃣ FETCH ---------- */
 self.addEventListener("fetch", event => {
-  if (event.request.mode === "navigate") {
-    event.respondWith(caches.match("./index.html"));
+  const url = new URL(event.request.url);
+
+  // 🔥 IMPORTANT: Ignore third-party requests (like hits.sh)
+  if (url.origin !== self.location.origin) {
     return;
   }
 
   event.respondWith(
-    caches.match(event.request).then(res => res || fetch(event.request))
+    caches.match(event.request).then(response => {
+      return response || fetch(event.request);
+    })
   );
 });
+
 
 /* ---------- 4️⃣ NOTIFICATION CLICK ---------- */
 self.addEventListener("notificationclick", event => {
@@ -65,3 +70,4 @@ function showReminder(title, body) {
     vibrate: [100, 50, 100]
   });
 }
+
