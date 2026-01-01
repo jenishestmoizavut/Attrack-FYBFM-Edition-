@@ -1,4 +1,4 @@
-const CACHE_VERSION = "v1.0.2";
+const CACHE_VERSION = "v1.0.3";
 const CACHE_NAME = `attrack-${CACHE_VERSION}`;
 
 /* ---------- 1️⃣ INSTALL ---------- */
@@ -41,3 +41,4 @@ self.addEventListener("fetch", event => {
     return;
   }
 });
+
